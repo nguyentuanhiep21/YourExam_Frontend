@@ -27,7 +27,13 @@ export function useAuth() {
   async function signUp(email: string, password: string) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/api/auth/callback`
+      }
+    });
     if (error) {
       setError(error.message);
     } else {
