@@ -23,7 +23,13 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${requestUrl.origin}/verify?status=error&message=${encodeURIComponent(exchangeError.message)}`);
     }
 
-    // Thành công
+    // Thành công, điều hướng dựa theo next param nếu có
+    const next = requestUrl.searchParams.get("next");
+    if (next) {
+      return NextResponse.redirect(`${requestUrl.origin}${next}`);
+    }
+    
+    // Mặc định
     return NextResponse.redirect(`${requestUrl.origin}/verify?status=success`);
   }
 

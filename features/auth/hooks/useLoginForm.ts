@@ -9,6 +9,8 @@ export function useLoginForm() {
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get("registered") === "true";
 
+  const passwordChanged = searchParams.get("passwordChanged") === "true";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -25,6 +27,7 @@ export function useLoginForm() {
     loading,
     error,
     justRegistered,
+    passwordChanged,
     handleSubmit,
   };
 }

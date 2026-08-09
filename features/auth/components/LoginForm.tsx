@@ -9,7 +9,7 @@ import { LoginFormView } from "../views/LoginFormView";
  * Không chứa JSX nghiệp vụ, chỉ truyền props xuống View.
  */
 export function LoginForm() {
-  const { email, setEmail, password, setPassword, loading, error, justRegistered, handleSubmit } =
+  const { email, setEmail, password, setPassword, loading, error, justRegistered, passwordChanged, handleSubmit } =
     useLoginForm();
 
   return (
@@ -19,6 +19,7 @@ export function LoginForm() {
       loading={loading}
       error={error}
       justRegistered={justRegistered}
+      passwordChanged={passwordChanged}
       onEmailChange={(e) => setEmail(e.target.value)}
       onPasswordChange={(e) => setPassword(e.target.value)}
       onSubmit={handleSubmit}
