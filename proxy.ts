@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register");
-  const isProtectedPage = pathname.startsWith("/dashboard");
+  const isProtectedPage = false;
 
   // Chưa đăng nhập → vào trang protected → redirect về login
   if (!user && isProtectedPage) {
@@ -43,7 +43,7 @@ export async function proxy(request: NextRequest) {
   // Đã đăng nhập → vào trang auth → redirect về dashboard
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
@@ -51,5 +51,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: ["/login", "/register"],
 };

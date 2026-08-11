@@ -1,6 +1,10 @@
 import { Search, ChevronDown } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { CreateExamButton } from "./CreateExamButton";
 
-export function HeroSection() {
+export async function HeroSection() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   const categories = ["Toán học", "Tiếng Việt"];
 
   return (
@@ -10,7 +14,7 @@ export function HeroSection() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
         <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-gray-900 mb-8 max-w-3xl leading-[1.1]">
-          Discover & Master Your Education
+          Khám phá & Chinh phục tri thức
         </h1>
 
         {/* Search Bar */}
@@ -22,24 +26,36 @@ export function HeroSection() {
             <input
               type="text"
               className="flex-1 bg-transparent py-2.5 text-base text-gray-900 placeholder:text-gray-500 outline-none"
-              placeholder="Search for courses, exams, or topics..."
+              placeholder="Tìm kiếm khóa học, đề thi hoặc chủ đề..."
             />
             <button className="bg-gray-100/80 hover:bg-gray-200 text-gray-800 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 ml-2">
-              Search
+              Tìm kiếm
             </button>
           </div>
         </div>
 
-        {/* Quick Filter Pills */}
-        <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl">
-          {categories.map((cat) => (
-            <button 
-              key={cat}
-              className="px-5 py-2 rounded-full bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 shadow-sm"
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Action & Filter Container */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-2">
+          {user && (
+            <>
+              {/* Create Exam Action */}
+              <CreateExamButton />
+
+              <div className="w-px h-8 bg-gray-300 hidden sm:block"></div>
+            </>
+          )}
+
+          {/* Quick Filter Pills */}
+          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl">
+            {categories.map((cat) => (
+              <button 
+                key={cat}
+                className="px-5 py-2 rounded-full bg-white text-gray-700 text-sm font-semibold border border-gray-200 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-200 transition-all duration-200 shadow-sm"
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </section>

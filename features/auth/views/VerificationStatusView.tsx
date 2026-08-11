@@ -33,7 +33,7 @@ export function VerificationStatusView({ status, message }: VerificationStatusVi
             Tuyệt vời! Tài khoản của bạn đã được kích hoạt. Bạn có thể bắt đầu sử dụng YourExam ngay bây giờ.
           </p>
           <Link
-            href="/dashboard"
+            href="/"
             className="inline-flex justify-center items-center w-full h-12 rounded-xl font-semibold text-sm text-white transition-all duration-200 active:scale-[0.98] cursor-pointer"
             style={{ background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)" }}
           >

@@ -41,7 +41,7 @@ export function useAuth() {
     if (error) {
       handleAuthError(error);
     } else {
-      router.push("/dashboard");
+      router.push("/");
       router.refresh();
     }
     setLoading(false);
