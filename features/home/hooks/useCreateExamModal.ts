@@ -22,6 +22,7 @@ export const useCreateExamModal = () => {
   const [distributionState, setDistributionState] = useState<Record<string, Record<number, number>>>({});
   const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
   const [isGeneratingExamAPI, setIsGeneratingExamAPI] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Supabase states
   const [savedBlueprints, setSavedBlueprints] = useState<any[]>([]);
@@ -203,7 +204,7 @@ export const useCreateExamModal = () => {
             promises.push(
               createExamApi.generateExercises(payload).then(res => {
                 if (res.success && res.data) {
-                  res.data = res.data.map((q: any) => ({ ...q, format: rule.format }));
+                  res.data = res.data.map((q: any) => ({ ...q, format: rule.format, exerciseType: typeId }));
                 }
                 return res;
               })
@@ -229,12 +230,48 @@ export const useCreateExamModal = () => {
     }
   };
 
+  const handleDownloadDocx = async () => {
+    setIsExporting(true);
+    try {
+      let defaultFileName = "DeThi";
+      if (selectedSubject && selectedGrade) {
+        const subject = selectedSubject.replace(/\s+/g, '');
+        const grade = selectedGrade.replace(/\s+/g, '');
+        defaultFileName = `De${subject}${grade}`;
+      }
+      
+      const payload = {
+        fileName: defaultFileName,
+        exercises: generatedQuestions.map(q => ({
+          content: q.content,
+          choices: q.format === "tu-luan" ? [] : q.choices,
+          correctAnswer: q.correctAnswer,
+          exerciseType: q.exerciseType || 0
+        }))
+      };
+
+      const blob = await createExamApi.exportToDocx(payload);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${defaultFileName}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert("Lỗi khi tải file DOCX: " + error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return {
     state: {
-      step, selectedGrade, selectedSubject, structureType, deletingId, customRules, isAddingQuestion, isGeneratingQuestion, questionFormat, newExerciseType, isGeneratingWizard, currentRuleIndex, distributionState, generatedQuestions, isGeneratingExamAPI, savedBlueprints, isLoadingBlueprints, blueprintName, editingBlueprintId, isSavingBlueprint, showSaveDialog, canProceed, hasSelectedBoth
+      step, selectedGrade, selectedSubject, structureType, deletingId, customRules, isAddingQuestion, isGeneratingQuestion, questionFormat, newExerciseType, isGeneratingWizard, currentRuleIndex, distributionState, generatedQuestions, isGeneratingExamAPI, savedBlueprints, isLoadingBlueprints, blueprintName, editingBlueprintId, isSavingBlueprint, showSaveDialog, canProceed, hasSelectedBoth, isExporting
     },
     actions: {
-      setStep, setSelectedGrade, setSelectedSubject, setStructureType, setDeletingId, setCustomRules, setIsAddingQuestion, setIsGeneratingQuestion, setQuestionFormat, setNewExerciseType, setIsGeneratingWizard, setCurrentRuleIndex, setDistributionState, setGeneratedQuestions, setIsGeneratingExamAPI, setSavedBlueprints, setIsLoadingBlueprints, setBlueprintName, setEditingBlueprintId, setIsSavingBlueprint, setShowSaveDialog, fetchBlueprints, saveCustomBlueprint, handleDeleteBlueprint, handleEditBlueprint, handleAddCustomRule, updateQuantity, removeRule, updateDistribution, executeGenerateExam
+      setStep, setSelectedGrade, setSelectedSubject, setStructureType, setDeletingId, setCustomRules, setIsAddingQuestion, setIsGeneratingQuestion, setQuestionFormat, setNewExerciseType, setIsGeneratingWizard, setCurrentRuleIndex, setDistributionState, setGeneratedQuestions, setIsGeneratingExamAPI, setSavedBlueprints, setIsLoadingBlueprints, setBlueprintName, setEditingBlueprintId, setIsSavingBlueprint, setShowSaveDialog, fetchBlueprints, saveCustomBlueprint, handleDeleteBlueprint, handleEditBlueprint, handleAddCustomRule, updateQuantity, removeRule, updateDistribution, executeGenerateExam, handleDownloadDocx
     }
   };
 };

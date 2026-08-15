@@ -1,11 +1,13 @@
-import { X } from "lucide-react";
+import { X, Loader2, Download } from "lucide-react";
 
 interface Props {
   generatedQuestions: any[];
+  isExporting?: boolean;
   onSetGeneratedQuestions: (questions: any[]) => void;
+  onDownloadDocx?: () => void;
 }
 
-export const ExamPreviewModal = ({ generatedQuestions, onSetGeneratedQuestions }: Props) => {
+export const ExamPreviewModal = ({ generatedQuestions, isExporting, onSetGeneratedQuestions, onDownloadDocx }: Props) => {
   if (generatedQuestions.length === 0) return null;
 
   return (
@@ -45,6 +47,16 @@ export const ExamPreviewModal = ({ generatedQuestions, onSetGeneratedQuestions }
             <button onClick={() => onSetGeneratedQuestions([])} className="px-6 py-3 font-bold text-gray-600 hover:bg-gray-200 bg-gray-100 rounded-xl transition-colors">
               Đóng
             </button>
+            {onDownloadDocx && (
+              <button
+                disabled={isExporting}
+                onClick={onDownloadDocx}
+                className="px-6 py-3 font-bold text-white bg-violet-600 hover:bg-violet-700 disabled:opacity-50 rounded-xl flex items-center justify-center gap-2 transition-colors"
+              >
+                {isExporting ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
+                Tải Đề thi & Đáp án (DOCX)
+              </button>
+            )}
         </div>
       </div>
     </div>

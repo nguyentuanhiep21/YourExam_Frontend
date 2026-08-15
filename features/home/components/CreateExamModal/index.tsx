@@ -167,7 +167,9 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
       {state.generatedQuestions.length > 0 && (
         <ExamPreviewModal
           generatedQuestions={state.generatedQuestions}
+          isExporting={state.isExporting}
           onSetGeneratedQuestions={actions.setGeneratedQuestions}
+          onDownloadDocx={actions.handleDownloadDocx}
         />
       )}
     </>,

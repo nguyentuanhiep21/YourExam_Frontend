@@ -41,7 +41,8 @@ export const createExamApi = {
   },
 
   async generateExercises(payload: GenerateExerciseRequestDto) {
-    const res = await fetch("https://yourexam-backend.onrender.com/api/exercises/generate", {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+    const res = await fetch(`${baseUrl}/exercises/generate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -49,5 +50,29 @@ export const createExamApi = {
       body: JSON.stringify(payload)
     });
     return res.json();
+  },
+
+  async exportToDocx(payload: { fileName: string, exercises: any[] }) {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+    const res = await fetch(`${baseUrl}/exercises/export/docx`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      if (res.status === 502 || res.status === 504) {
+        throw new Error("Server đang khởi động (Cold Start) hoặc quá tải, vui lòng chờ 30-60 giây rồi thử lại.");
+      }
+      throw new Error(`Lỗi khi tạo file docx (Status: ${res.status})`);
+    }
+
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("text/html")) {
+      throw new Error("Server trả về trang lỗi HTML thay vì file. Khả năng cao do Server đang khởi động, vui lòng chờ thêm.");
+    }
+
+    return res.blob();
   }
 };
