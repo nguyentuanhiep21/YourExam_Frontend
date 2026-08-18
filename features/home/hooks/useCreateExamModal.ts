@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { CustomRule } from "../types/createExam.types";
-import { EXERCISE_TYPES } from "../constants/createExam.constants";
+import { EXERCISE_TYPES, SUBJECT_CODE_MAP, getExerciseTypes } from "../constants/createExam.constants";
 import { createExamApi } from "../api/createExam.api";
 
 export const useCreateExamModal = () => {
@@ -127,20 +127,22 @@ export const useCreateExamModal = () => {
     setStructureType("custom");
   };
 
-  const canProceed = selectedGrade === "Lớp 1" && selectedSubject === "Toán";
+  const SUPPORTED_SUBJECTS = ["Toán", "Tiếng Việt"];
+  const canProceed = selectedGrade === "Lớp 1" && selectedSubject !== null && SUPPORTED_SUBJECTS.includes(selectedSubject);
   const hasSelectedBoth = selectedGrade && selectedSubject;
 
-  const handleAddCustomRule = (diffId: string, diffName: string) => {
-    if (!questionFormat) return;
+  const handleAddCustomRule = (diffId: string, diffName: string, overrideFormat?: "tu-luan" | "trac-nghiem") => {
+    const finalFormat = overrideFormat || questionFormat;
+    if (!finalFormat) return;
 
     setCustomRules(prev => {
-      const existing = prev.find(r => r.format === questionFormat && r.diffId === diffId);
+      const existing = prev.find(r => r.format === finalFormat && r.diffId === diffId);
       if (existing) {
         return prev.map(r => r.id === existing.id ? { ...r, quantity: r.quantity + 1 } : r);
       }
       return [...prev, {
         id: Date.now().toString(),
-        format: questionFormat,
+        format: finalFormat,
         diffId,
         diffName,
         quantity: 1
@@ -193,9 +195,10 @@ export const useCreateExamModal = () => {
           const typeId = parseInt(typeIdStr);
           const qty = dist[typeId];
           if (qty > 0) {
+            const subjectCode = SUBJECT_CODE_MAP[selectedSubject || "Toán"] || "toan";
             const payload = {
-              Subject: selectedSubject || "Toán",
-              Difficulty: rule.diffName === "Dễ" ? 1 : rule.diffName === "Trung bình" ? 2 : 3,
+              Subject: subjectCode,
+              Difficulty: rule.diffName === "Khó" ? 3 : rule.diffName === "Trung bình" ? 2 : 1,
               ExerciseType: typeId,
               GradeLevel: gradeMap[selectedGrade || "Lớp 1"] || 1,
               Quantity: qty

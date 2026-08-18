@@ -1,8 +1,9 @@
 import { X, Loader2 } from "lucide-react";
-import { EXERCISE_TYPES } from "../../constants/createExam.constants";
+import { getExerciseTypes } from "../../constants/createExam.constants";
 import { CustomRule } from "../../types/createExam.types";
 
 interface Props {
+  selectedSubject: string | null;
   customRules: CustomRule[];
   currentRuleIndex: number;
   distributionState: Record<string, Record<number, number>>;
@@ -14,12 +15,13 @@ interface Props {
 }
 
 export const GenerationWizardModal = ({
-  customRules, currentRuleIndex, distributionState, isGeneratingExamAPI,
+  selectedSubject, customRules, currentRuleIndex, distributionState, isGeneratingExamAPI,
   onSetIsGeneratingWizard, onSetCurrentRuleIndex, onUpdateDistribution, onExecuteGenerateExam
 }: Props) => {
   const rule = customRules[currentRuleIndex];
   if (!rule) return null;
 
+  const exerciseTypes = getExerciseTypes(selectedSubject, rule.format);
   const dist = distributionState[rule.id] || {};
   const currentTotal = Object.values(dist).reduce((a, b) => a + b, 0);
   const needed = rule.quantity;
@@ -38,7 +40,7 @@ export const GenerationWizardModal = ({
         <div className="space-y-6">
           <div className="p-4 bg-violet-50 rounded-xl border border-violet-100">
             <p className="font-semibold text-violet-900 mb-1">
-              {rule.format === "tu-luan" ? "Tự luận" : "Trắc nghiệm"} - {rule.diffName}
+              {rule.format === "tu-luan" ? "Tự luận" : "Trắc nghiệm"}{rule.diffName !== "Mặc định" ? ` - ${rule.diffName}` : ""}
             </p>
             <p className="text-sm text-violet-700">
               Bạn cần phân bổ đúng <strong className="text-xl">{needed}</strong> câu hỏi. 
@@ -50,7 +52,7 @@ export const GenerationWizardModal = ({
           </div>
 
           <div className="space-y-3">
-            {EXERCISE_TYPES.map(et => (
+            {exerciseTypes.map(et => (
               <div key={et.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-xl hover:border-gray-300">
                 <span className="font-medium text-gray-700">{et.name}</span>
                 <div className="flex items-center gap-3">

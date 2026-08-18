@@ -194,7 +194,7 @@ export const StructureStep = ({
               <div key={rule.id} className="p-5 rounded-2xl border border-indigo-100 bg-white shadow-sm flex items-center justify-between animate-in fade-in slide-in-from-bottom-2">
                 <div className="flex flex-col gap-1">
                   <span className="font-bold text-lg text-indigo-900">
-                    {rule.format === "tu-luan" ? "Tự luận" : "Trắc nghiệm"} - {rule.diffName}
+                    {rule.format === "tu-luan" ? "Tự luận" : "Trắc nghiệm"}{rule.diffName !== "Mặc định" ? ` - ${rule.diffName}` : ""}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">

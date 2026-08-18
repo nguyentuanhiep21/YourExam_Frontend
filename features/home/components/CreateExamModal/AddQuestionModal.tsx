@@ -2,16 +2,24 @@ import { X } from "lucide-react";
 import { DIFFICULTIES } from "../../constants/createExam.constants";
 
 interface Props {
+  selectedSubject: string | null;
   questionFormat: "tu-luan" | "trac-nghiem" | null;
   onSetIsAddingQuestion: (val: boolean) => void;
   onSetNewExerciseType: (val: number | null) => void;
   onSetQuestionFormat: (val: "tu-luan" | "trac-nghiem" | null) => void;
-  onAddCustomRule: (diffId: string, diffName: string) => void;
+  onAddCustomRule: (diffId: string, diffName: string, overrideFormat?: "tu-luan" | "trac-nghiem") => void;
 }
 
 export const AddQuestionModal = ({
-  questionFormat, onSetIsAddingQuestion, onSetNewExerciseType, onSetQuestionFormat, onAddCustomRule
+  selectedSubject, questionFormat, onSetIsAddingQuestion, onSetNewExerciseType, onSetQuestionFormat, onAddCustomRule
 }: Props) => {
+  const handleFormatSelect = (format: "tu-luan" | "trac-nghiem") => {
+    if (selectedSubject === "Tiếng Việt") {
+      onAddCustomRule("default", "Mặc định", format);
+    } else {
+      onSetQuestionFormat(format);
+    }
+  };
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="w-full max-w-md p-6 rounded-2xl border border-violet-100 bg-white shadow-2xl space-y-6 animate-in zoom-in-95 fade-in duration-200">
@@ -33,13 +41,13 @@ export const AddQuestionModal = ({
           <p className="text-sm font-semibold text-gray-700 mb-3">1. Chọn hình thức:</p>
           <div className="grid grid-cols-2 gap-3">
             <button
-              onClick={() => onSetQuestionFormat("tu-luan")}
+              onClick={() => handleFormatSelect("tu-luan")}
               className={`py-3 px-3 text-sm font-semibold rounded-xl border transition-all ${questionFormat === "tu-luan" ? 'bg-violet-50 border-violet-500 text-violet-700 shadow-sm ring-1 ring-violet-500' : 'border-gray-200 hover:border-violet-300 hover:bg-violet-50 text-gray-600'}`}
             >
               Tự luận
             </button>
             <button
-              onClick={() => onSetQuestionFormat("trac-nghiem")}
+              onClick={() => handleFormatSelect("trac-nghiem")}
               className={`py-3 px-3 text-sm font-semibold rounded-xl border transition-all ${questionFormat === "trac-nghiem" ? 'bg-violet-50 border-violet-500 text-violet-700 shadow-sm ring-1 ring-violet-500' : 'border-gray-200 hover:border-violet-300 hover:bg-violet-50 text-gray-600'}`}
             >
               Trắc nghiệm

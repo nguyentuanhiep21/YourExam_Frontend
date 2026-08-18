@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { CreateExamModalProps } from "../../types/createExam.types";
 import { useCreateExamModal } from "../../hooks/useCreateExamModal";
-import { EXERCISE_TYPES } from "../../constants/createExam.constants";
+import { getExerciseTypes } from "../../constants/createExam.constants";
 
 import { BasicInfoStep } from "./BasicInfoStep";
 import { StructureStep } from "./StructureStep";
@@ -97,7 +97,7 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
                 </button>
                 {state.hasSelectedBoth && !state.canProceed && (
                   <p className="mt-3 text-sm text-amber-600 font-medium">
-                    Hiện tại hệ thống chỉ mới hỗ trợ đề thi Toán Lớp 1. Các môn và khối lớp khác đang được phát triển.
+                    Hiện tại hệ thống chỉ mới hỗ trợ đề thi Toán và Tiếng Việt Lớp 1. Các môn và khối lớp khác đang được phát triển.
                   </p>
                 )}
               </div>
@@ -110,7 +110,8 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
                   const initDist: Record<string, Record<number, number>> = {};
                   state.customRules.forEach(r => {
                     initDist[r.id] = {};
-                    EXERCISE_TYPES.forEach(et => {
+                    const exerciseTypes = getExerciseTypes(state.selectedSubject, r.format);
+                    exerciseTypes.forEach(et => {
                       initDist[r.id][et.id] = 0;
                     });
                   });
@@ -132,6 +133,7 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
 
       {state.isAddingQuestion && !state.isGeneratingQuestion && (
         <AddQuestionModal
+          selectedSubject={state.selectedSubject}
           questionFormat={state.questionFormat}
           onSetIsAddingQuestion={actions.setIsAddingQuestion}
           onSetNewExerciseType={actions.setNewExerciseType}
@@ -153,6 +155,7 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
 
       {state.isGeneratingWizard && (
         <GenerationWizardModal
+          selectedSubject={state.selectedSubject}
           customRules={state.customRules}
           currentRuleIndex={state.currentRuleIndex}
           distributionState={state.distributionState}
