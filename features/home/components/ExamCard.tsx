@@ -35,57 +35,58 @@ export function ExamCard({ exam }: ExamCardProps) {
   }
 
   return (
-    <div className="group min-w-[280px] w-[300px] sm:w-[320px] bg-white rounded-2xl border border-gray-100 p-2 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col h-full snap-start overflow-hidden">
+    <div className="group min-w-[280px] w-[300px] sm:w-[320px] bg-white rounded-[2rem] border border-gray-100/80 p-2 shadow-sm hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full snap-start overflow-hidden">
       
       {/* Cover Image Area */}
-      <div className={`relative h-44 w-full rounded-xl overflow-hidden mb-4 p-4 ${coverGradient}`}>
+      <div className={`relative h-48 w-full rounded-[1.5rem] overflow-hidden mb-5 p-4 ${coverGradient}`}>
         {/* The icon image on the right */}
         <div 
-          className="absolute inset-y-4 right-4 w-[60%] bg-right bg-contain bg-no-repeat scale-90 group-hover:scale-100 group-hover:-translate-x-2 transition-transform duration-500 drop-shadow-sm origin-right"
+          className="absolute inset-y-4 right-4 w-[60%] bg-right bg-contain bg-no-repeat scale-90 group-hover:scale-105 group-hover:-translate-x-2 transition-transform duration-700 drop-shadow-sm origin-right"
           style={{ backgroundImage: `url('${coverImage}')` }}
         />
         
         {/* Top-left tag on the cover */}
-        <div className="absolute top-3 left-3 flex items-center">
-          <div className={`bg-white/80 backdrop-blur-sm border border-white/50 rounded-lg px-3 py-1.5 shadow-sm text-xs font-bold tracking-wide ${tagTextColor}`}>
+        <div className="absolute top-4 left-4 flex items-center">
+          <div className={`bg-white/90 backdrop-blur-md border border-white/80 rounded-xl px-4 py-2 shadow-sm text-xs font-bold tracking-wide ${tagTextColor}`}>
             {exam.subject}
           </div>
         </div>
       </div>
 
-      <div className="px-3 pb-3 flex flex-col flex-1">
+      <div className="px-4 pb-4 flex flex-col flex-1">
         {/* Title */}
         <div className="flex-1">
-          <h3 className="text-lg font-bold text-gray-900 leading-snug line-clamp-2">
+          <h3 className="text-xl font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors">
             {exam.title}
           </h3>
-          <p className="text-sm text-gray-500 mt-1 font-medium">
+          <p className="text-sm text-gray-500 mt-2 font-medium flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-300"></span>
             {exam.school}
           </p>
         </div>
 
         {/* Footer: Stats */}
-        <div className="flex items-center justify-between mt-6">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center text-violet-600">
+        <div className="flex items-center justify-between mt-8 gap-2">
+          <div className="flex items-center gap-2 bg-emerald-50/50 px-2 py-2 rounded-[1.25rem] border border-emerald-100/50 group-hover:bg-emerald-50 transition-colors flex-1 overflow-hidden">
+            <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
               <ArrowUpCircle className="w-4 h-4" />
             </div>
-            <div>
-              <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Hữu ích</div>
-              <div className="text-sm font-bold text-gray-800 flex items-center gap-1">
-                {formatNumber(exam.upvotes)} <span className="text-emerald-500 text-xs">↑</span>
+            <div className="min-w-0">
+              <div className="text-[9px] font-bold text-emerald-600/70 uppercase tracking-wider whitespace-nowrap truncate">Hữu ích</div>
+              <div className="text-sm font-extrabold text-emerald-900 flex items-center gap-1">
+                {formatNumber(exam.upvotes)} <span className="text-emerald-500 text-[10px]">↑</span>
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center text-violet-600">
+          <div className="flex items-center gap-2 bg-indigo-50/50 px-2 py-2 rounded-[1.25rem] border border-indigo-100/50 group-hover:bg-indigo-50 transition-colors flex-1 overflow-hidden">
+            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm shrink-0">
               <Download className="w-4 h-4" />
             </div>
-            <div>
-              <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Tải xuống</div>
-              <div className="text-sm font-bold text-gray-800 flex items-center gap-1">
-                {formatNumber(exam.downloads)} <span className="text-red-500 text-xs">↓</span>
+            <div className="min-w-0">
+              <div className="text-[9px] font-bold text-indigo-600/70 uppercase tracking-wider whitespace-nowrap truncate">Tải về</div>
+              <div className="text-sm font-extrabold text-indigo-900 flex items-center gap-1">
+                {formatNumber(exam.downloads)} <span className="text-indigo-500 text-[10px]">↓</span>
               </div>
             </div>
           </div>

@@ -12,11 +12,12 @@ export interface CustomRule {
 
 // Request DTOs
 export interface GenerateExerciseRequestDto {
-  Subject: string;
-  Difficulty: number;
-  ExerciseType: number;
-  GradeLevel: number;
-  Quantity: number;
+  subject: string;
+  difficulty: number;
+  exerciseType: number;
+  gradeLevel: number;
+  quantity: number;
+  format?: number;
 }
 
 export interface CreateBlueprintRuleDto {

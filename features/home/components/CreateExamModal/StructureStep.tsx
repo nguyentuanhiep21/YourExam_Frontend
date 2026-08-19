@@ -34,12 +34,12 @@ export const StructureStep = ({
   return (
     <div className="space-y-8">
       {/* Selected Context */}
-      <div className="flex items-center gap-3">
-        <span className="px-4 py-1.5 bg-violet-100 text-violet-700 rounded-full text-sm font-semibold">
+      <div className="flex items-center gap-3 bg-gray-50/80 p-3 rounded-2xl border border-gray-100">
+        <span className="px-4 py-1.5 bg-white shadow-sm text-violet-700 rounded-xl text-sm font-bold border border-violet-100">
           {selectedGrade}
         </span>
-        <span className="text-gray-400">/</span>
-        <span className="px-4 py-1.5 bg-violet-100 text-violet-700 rounded-full text-sm font-semibold">
+        <span className="text-gray-300 font-bold">/</span>
+        <span className="px-4 py-1.5 bg-white shadow-sm text-violet-700 rounded-xl text-sm font-bold border border-violet-100">
           {selectedSubject}
         </span>
         <button
@@ -47,7 +47,7 @@ export const StructureStep = ({
             onSetStep(1);
             onSetStructureType(null);
           }}
-          className="ml-auto text-sm text-violet-600 hover:text-violet-700 font-medium underline-offset-4 hover:underline"
+          className="ml-auto px-4 py-1.5 text-sm text-gray-500 hover:text-gray-900 bg-white border border-gray-200 rounded-xl font-semibold shadow-sm hover:bg-gray-50 transition-all active:scale-95"
         >
           Thay đổi
         </button>
@@ -55,14 +55,15 @@ export const StructureStep = ({
 
       {!structureType && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">Cấu trúc đề</h3>
+          <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Cấu trúc đề</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <button
               onClick={() => onSetStructureType("template")}
-              className="flex flex-col items-start p-6 rounded-2xl border border-gray-200 bg-white hover:border-violet-300 hover:bg-violet-50 transition-all duration-200 text-left"
+              className="group flex flex-col items-start p-6 rounded-[1.5rem] border border-gray-200/80 bg-white hover:border-violet-300 hover:bg-gradient-to-br hover:from-white hover:to-violet-50/50 hover:shadow-[0_8px_24px_rgba(139,92,246,0.12)] transition-all duration-300 hover:-translate-y-1 active:scale-95 text-left"
             >
-              <span className="font-bold text-lg text-gray-900 mb-2">💡 Gợi ý</span>
-              <span className="text-sm text-gray-500">Tạo đề nhanh dựa trên các khung cấu trúc chuẩn của Bộ GD&ĐT.</span>
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform duration-300">💡</div>
+              <span className="font-bold text-lg text-gray-900 mb-2">Gợi ý</span>
+              <span className="text-sm text-gray-500 leading-relaxed">Tạo đề nhanh dựa trên các khung cấu trúc chuẩn của Bộ GD&ĐT.</span>
             </button>
             <button
               onClick={() => {
@@ -71,17 +72,19 @@ export const StructureStep = ({
                 onSetEditingBlueprintId(null);
                 onSetStructureType("custom");
               }}
-              className="flex flex-col items-start p-6 rounded-2xl border border-gray-200 bg-white hover:border-violet-300 hover:bg-violet-50 transition-all duration-200 text-left"
+              className="group flex flex-col items-start p-6 rounded-[1.5rem] border border-gray-200/80 bg-white hover:border-indigo-300 hover:bg-gradient-to-br hover:from-white hover:to-indigo-50/50 hover:shadow-[0_8px_24px_rgba(99,102,241,0.12)] transition-all duration-300 hover:-translate-y-1 active:scale-95 text-left"
             >
-              <span className="font-bold text-lg text-gray-900 mb-2">⚙️ Tùy chỉnh</span>
-              <span className="text-sm text-gray-500">Tự do thiết kế cấu trúc đề thi, chọn độ khó cho từng câu hỏi riêng biệt.</span>
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform duration-300">⚙️</div>
+              <span className="font-bold text-lg text-gray-900 mb-2">Tùy chỉnh</span>
+              <span className="text-sm text-gray-500 leading-relaxed">Tự do thiết kế cấu trúc đề thi, chọn độ khó cho từng câu hỏi riêng biệt.</span>
             </button>
             <button
               onClick={() => onSetStructureType("saved")}
-              className="flex flex-col items-start p-6 rounded-2xl border border-gray-200 bg-white hover:border-violet-300 hover:bg-violet-50 transition-all duration-200 text-left"
+              className="group flex flex-col items-start p-6 rounded-[1.5rem] border border-gray-200/80 bg-white hover:border-emerald-300 hover:bg-gradient-to-br hover:from-white hover:to-emerald-50/50 hover:shadow-[0_8px_24px_rgba(16,185,129,0.12)] transition-all duration-300 hover:-translate-y-1 active:scale-95 text-left"
             >
-              <span className="font-bold text-lg text-gray-900 mb-2">💾 Đã lưu</span>
-              <span className="text-sm text-gray-500">Sử dụng lại các cấu trúc đề thi bạn đã thiết kế và lưu trước đó.</span>
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform duration-300">💾</div>
+              <span className="font-bold text-lg text-gray-900 mb-2">Đã lưu</span>
+              <span className="text-sm text-gray-500 leading-relaxed">Sử dụng lại các cấu trúc đề thi bạn đã thiết kế và lưu trước đó.</span>
             </button>
           </div>
         </div>
@@ -191,17 +194,30 @@ export const StructureStep = ({
 
           <div className="space-y-4">
             {customRules.map((rule) => (
-              <div key={rule.id} className="p-5 rounded-2xl border border-indigo-100 bg-white shadow-sm flex items-center justify-between animate-in fade-in slide-in-from-bottom-2">
-                <div className="flex flex-col gap-1">
-                  <span className="font-bold text-lg text-indigo-900">
-                    {rule.format === "tu-luan" ? "Tự luận" : "Trắc nghiệm"}{rule.diffName !== "Mặc định" ? ` - ${rule.diffName}` : ""}
-                  </span>
+              <div key={rule.id} className="p-5 rounded-[1.25rem] border border-gray-200/80 bg-white shadow-sm hover:shadow-md hover:border-indigo-200 flex items-center justify-between transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 group">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 font-bold">
+                    {rule.format === "tu-luan" ? "TL" : "TN"}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-bold text-gray-900 text-base">
+                      {rule.format === "tu-luan" ? "Tự luận" : "Trắc nghiệm"}
+                    </span>
+                    {rule.diffName !== "Mặc định" && (
+                      <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-0.5 rounded-md inline-block w-fit">
+                        {rule.diffName}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button onClick={() => onUpdateQuantity(rule.id, -1)} className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-gray-700 font-bold w-8 h-8 flex items-center justify-center">-</button>
-                  <span className="font-semibold text-gray-900 w-4 text-center">{rule.quantity}</span>
-                  <button onClick={() => onUpdateQuantity(rule.id, 1)} className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-gray-700 font-bold w-8 h-8 flex items-center justify-center">+</button>
-                  <button onClick={() => onRemoveRule(rule.id)} className="ml-2 p-2 text-red-500 hover:bg-red-50 rounded-lg text-sm font-semibold">Xóa</button>
+                <div className="flex items-center gap-3 bg-gray-50 p-1.5 rounded-xl border border-gray-100">
+                  <button onClick={() => onUpdateQuantity(rule.id, -1)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm text-gray-600 font-bold transition-all">-</button>
+                  <span className="font-bold text-gray-900 w-6 text-center">{rule.quantity}</span>
+                  <button onClick={() => onUpdateQuantity(rule.id, 1)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm text-gray-600 font-bold transition-all">+</button>
+                  <div className="w-[1px] h-6 bg-gray-200 mx-1"></div>
+                  <button onClick={() => onRemoveRule(rule.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
             ))}
@@ -210,14 +226,14 @@ export const StructureStep = ({
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={() => onSetIsAddingQuestion(true)}
-                  className="flex-1 p-4 rounded-xl border-2 border-dashed border-gray-200 text-gray-500 hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50 transition-all font-semibold flex items-center justify-center gap-2"
+                  className="flex-1 p-4 rounded-[1.25rem] border-2 border-dashed border-gray-200 text-gray-500 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all font-bold flex items-center justify-center gap-2 active:scale-[0.98]"
                 >
                   <span>+ Thêm tùy chỉnh</span>
                 </button>
                 {customRules.length > 0 && (
                   <button
                     onClick={() => onSetShowSaveDialog(true)}
-                    className="px-6 py-4 rounded-xl bg-violet-50 text-violet-700 hover:bg-violet-100 font-bold transition-all flex items-center gap-2"
+                    className="px-6 py-4 rounded-[1.25rem] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold transition-all flex items-center gap-2 active:scale-95 border border-indigo-100 shadow-sm"
                   >
                     <Save size={18} /> Lưu cấu trúc
                   </button>

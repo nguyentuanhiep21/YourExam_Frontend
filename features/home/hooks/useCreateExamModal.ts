@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { CustomRule } from "../types/createExam.types";
-import { EXERCISE_TYPES, SUBJECT_CODE_MAP, getExerciseTypes } from "../constants/createExam.constants";
+import { EXERCISE_TYPES, SUBJECT_CODE_MAP, getExerciseTypes, QuestionFormat, QuestionDifficulty } from "../constants/createExam.constants";
 import { createExamApi } from "../api/createExam.api";
 
 export const useCreateExamModal = () => {
@@ -79,8 +79,8 @@ export const useCreateExamModal = () => {
       const rulesPayload = customRules.map(q => ({
         BlueprintId: blueprintId as number,
         Topic: "Câu hỏi tuỳ chỉnh", 
-        Difficulty: q.diffName === "Dễ" ? 1 : q.diffName === "Trung bình" ? 2 : 3,
-        QuestionFormat: q.format === "tu-luan" ? 2 : 1, 
+        Difficulty: q.diffName === "Dễ" ? QuestionDifficulty.Easy : q.diffName === "Trung bình" ? QuestionDifficulty.Medium : QuestionDifficulty.Hard,
+        QuestionFormat: q.format === "tu-luan" ? QuestionFormat.Essay : QuestionFormat.MultipleChoice, 
         Quantity: q.quantity
       }));
       
@@ -112,9 +112,9 @@ export const useCreateExamModal = () => {
     setEditingBlueprintId(bp.Id);
     setBlueprintName(bp.Name);
     const mappedRules = (bp.BlueprintRules || []).map((rule: any) => {
-      const diffName = rule.Difficulty === 1 ? "Dễ" : rule.Difficulty === 2 ? "Trung bình" : "Khó";
-      const diffId = rule.Difficulty === 1 ? "easy" : rule.Difficulty === 2 ? "medium" : "hard";
-      const format = rule.QuestionFormat === 2 ? "tu-luan" : "trac-nghiem";
+      const diffName = rule.Difficulty === QuestionDifficulty.Easy ? "Dễ" : rule.Difficulty === QuestionDifficulty.Medium ? "Trung bình" : "Khó";
+      const diffId = rule.Difficulty === QuestionDifficulty.Easy ? "easy" : rule.Difficulty === QuestionDifficulty.Medium ? "medium" : "hard";
+      const format = rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem";
       return {
         id: rule.Id.toString(),
         diffId,
@@ -197,11 +197,12 @@ export const useCreateExamModal = () => {
           if (qty > 0) {
             const subjectCode = SUBJECT_CODE_MAP[selectedSubject || "Toán"] || "toan";
             const payload = {
-              Subject: subjectCode,
-              Difficulty: rule.diffName === "Khó" ? 3 : rule.diffName === "Trung bình" ? 2 : 1,
-              ExerciseType: typeId,
-              GradeLevel: gradeMap[selectedGrade || "Lớp 1"] || 1,
-              Quantity: qty
+              subject: subjectCode,
+              difficulty: rule.diffName === "Khó" ? QuestionDifficulty.Hard : rule.diffName === "Trung bình" ? QuestionDifficulty.Medium : QuestionDifficulty.Easy,
+              exerciseType: typeId,
+              gradeLevel: gradeMap[selectedGrade || "Lớp 1"] || 1,
+              quantity: qty,
+              format: rule.format === "tu-luan" ? QuestionFormat.Essay : QuestionFormat.MultipleChoice
             };
 
             promises.push(
@@ -218,11 +219,29 @@ export const useCreateExamModal = () => {
 
       const results = await Promise.all(promises);
       let allQuestions: any[] = [];
+      let hasError = false;
+      let errorMsg = "";
+
       results.forEach(res => {
         if (res.success && res.data) {
           allQuestions = [...allQuestions, ...res.data];
+        } else if (!res.success) {
+          hasError = true;
+          errorMsg = res.errorMessage || "Có lỗi xảy ra khi tạo câu hỏi.";
         }
       });
+      
+      if (hasError) {
+        alert(errorMsg);
+        setIsGeneratingExamAPI(false);
+        return;
+      }
+
+      if (allQuestions.length === 0) {
+        alert("Không thể tạo được đề thi (không tìm thấy câu hỏi phù hợp).");
+        setIsGeneratingExamAPI(false);
+        return;
+      }
       
       setGeneratedQuestions(allQuestions);
       setIsGeneratingWizard(false);

@@ -23,21 +23,21 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-        <div className="relative w-full max-w-3xl bg-white/90 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="relative w-full max-w-3xl bg-white/85 backdrop-blur-2xl border border-white/80 rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-[0.98] duration-300 ease-out">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between p-7 border-b border-gray-200/50 bg-white/50">
             <div className="text-left">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-3xl font-extrabold bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent tracking-tight">
                 {state.step === 1 ? "Khởi tạo đề thi" : "Tùy chỉnh & Hoàn tất"}
               </h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 mt-1.5 font-medium">
                 {state.step === 1 ? "Bước 1: Chọn Lớp và Môn học" : "Bước 2: Cấu trúc đề thi"}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100/80 rounded-full transition-all active:scale-95"
             >
               <X className="w-6 h-6" />
             </button>
@@ -82,21 +82,21 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex flex-col items-center">
+          <div className="p-7 border-t border-gray-200/50 bg-gray-50/80 flex flex-col items-center backdrop-blur-md">
             {state.step === 1 && (
               <div className="w-full flex flex-col items-center">
                 <button
                   disabled={!state.canProceed}
                   onClick={() => actions.setStep(2)}
-                  className={`w-full max-w-sm py-3.5 rounded-xl text-base font-bold transition-all duration-300 ${state.canProceed
-                      ? "bg-violet-600 text-white shadow-lg shadow-violet-200 hover:bg-violet-700 hover:-translate-y-0.5"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  className={`w-full max-w-sm py-4 rounded-2xl text-base font-bold transition-all duration-300 ${state.canProceed
+                      ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_8px_20px_rgba(139,92,246,0.3)] hover:shadow-[0_12px_25px_rgba(139,92,246,0.4)] hover:-translate-y-1 active:scale-[0.98]"
+                      : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
                     }`}
                 >
                   Tiếp tục
                 </button>
                 {state.hasSelectedBoth && !state.canProceed && (
-                  <p className="mt-3 text-sm text-amber-600 font-medium">
+                  <p className="mt-4 text-sm text-amber-600 font-medium">
                     Hiện tại hệ thống chỉ mới hỗ trợ đề thi Toán và Tiếng Việt Lớp 1. Các môn và khối lớp khác đang được phát triển.
                   </p>
                 )}
@@ -119,9 +119,9 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
                   actions.setCurrentRuleIndex(0);
                   actions.setIsGeneratingWizard(true);
                 }}
-                className={`w-full max-w-sm flex items-center justify-center gap-2 py-3.5 rounded-xl text-base font-bold transition-all duration-300 ${state.structureType === "custom" && state.customRules.length > 0
-                    ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-0.5"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                className={`w-full max-w-sm flex items-center justify-center gap-2 py-4 rounded-2xl text-base font-bold transition-all duration-300 ${state.structureType === "custom" && state.customRules.length > 0
+                    ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_8px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_12px_25px_rgba(99,102,241,0.4)] hover:-translate-y-1 active:scale-[0.98]"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
                   }`}
               >
                 <span>✨ Tạo Đề Ngay</span>

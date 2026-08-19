@@ -14,21 +14,21 @@ export async function HeroSection() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
         <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-gray-900 mb-8 max-w-3xl leading-[1.1]">
-          Khám phá & Chinh phục tri thức
+          Khám phá & <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">Chinh phục tri thức</span>
         </h1>
 
         {/* Search Bar */}
         <div className="w-full max-w-2xl mb-8">
-          <div className="relative flex items-center bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-full p-2">
-            <div className="pl-4 pr-3 flex items-center pointer-events-none text-gray-400">
-              <Search className="h-5 w-5" />
+          <div className="relative flex items-center bg-white/80 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] rounded-full p-2.5 group hover:shadow-[0_20px_60px_-15px_rgba(139,92,246,0.15)] hover:border-indigo-200/50 transition-all duration-500">
+            <div className="pl-5 pr-3 flex items-center pointer-events-none text-indigo-400 group-focus-within:text-indigo-600 transition-colors">
+              <Search className="h-6 w-6" />
             </div>
             <input
               type="text"
-              className="flex-1 bg-transparent py-2.5 text-base text-gray-900 placeholder:text-gray-500 outline-none"
+              className="flex-1 bg-transparent py-3 text-lg text-gray-900 placeholder:text-gray-400 outline-none w-full"
               placeholder="Tìm kiếm khóa học, đề thi hoặc chủ đề..."
             />
-            <button className="bg-gray-100/80 hover:bg-gray-200 text-gray-800 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 ml-2">
+            <button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:shadow-[0_8px_20px_rgba(99,102,241,0.3)] hover:-translate-y-0.5 active:scale-95 text-white px-8 py-3.5 rounded-full text-base font-bold transition-all duration-300 ml-2">
               Tìm kiếm
             </button>
           </div>
@@ -50,7 +50,7 @@ export async function HeroSection() {
             {categories.map((cat) => (
               <button 
                 key={cat}
-                className="px-5 py-2 rounded-full bg-white text-gray-700 text-sm font-semibold border border-gray-200 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-200 transition-all duration-200 shadow-sm"
+                className="px-6 py-2.5 rounded-full bg-white/80 backdrop-blur-md text-gray-700 text-sm font-bold border border-white/80 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 hover:text-indigo-700 hover:border-indigo-200 hover:shadow-[0_8px_16px_rgba(99,102,241,0.1)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 shadow-sm"
               >
                 {cat}
               </button>
