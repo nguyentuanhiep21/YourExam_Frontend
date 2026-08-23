@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GeneratedExam, UpdateGeneratedExamPayload, UpdateGeneratedExamQuestionPayload } from "../types/exam.types";
+import { GeneratedExam, UpdateGeneratedExamPayload, UpdateGeneratedExamQuestionPayload, GeneratedExamQuestion } from "../types/exam.types";
 import QuestionList from "./QuestionList";
 import { Clock, BookOpen, BarChart, ThumbsUp, Download, Award, ArrowLeft, Pencil, Save, X, Loader2 } from "lucide-react";
 import Link from "next/link";
