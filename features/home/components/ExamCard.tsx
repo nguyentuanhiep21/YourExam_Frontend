@@ -1,5 +1,6 @@
 import { Download, ArrowUpCircle, FileText } from "lucide-react";
 import { ExamMockData } from "../types";
+import Link from "next/link";
 
 // Helper function to format numbers (e.g. 12000 -> 12K)
 function formatNumber(num: number): string {
@@ -35,7 +36,7 @@ export function ExamCard({ exam }: ExamCardProps) {
   }
 
   return (
-    <div className="group min-w-[280px] w-[300px] sm:w-[320px] bg-white rounded-[2rem] border border-gray-100/80 p-2 shadow-sm hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full snap-start overflow-hidden">
+    <Link href={`/exam/${exam.id}`} className="block group min-w-[280px] w-[300px] sm:w-[320px] bg-white rounded-[2rem] border border-gray-100/80 p-2 shadow-sm hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full snap-start overflow-hidden">
       
       {/* Cover Image Area */}
       <div className={`relative h-48 w-full rounded-[1.5rem] overflow-hidden mb-5 p-4 ${coverGradient}`}>
@@ -92,6 +93,6 @@ export function ExamCard({ exam }: ExamCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

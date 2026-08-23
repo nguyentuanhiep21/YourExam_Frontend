@@ -53,9 +53,9 @@ export const GenerationWizardModal = ({
 
           <div className="space-y-3">
             {exerciseTypes.map(et => (
-              <div key={et.id} className="flex items-center justify-between p-4 border border-gray-200/80 rounded-[1.25rem] hover:border-indigo-200 hover:shadow-sm bg-white transition-all duration-300">
-                <span className="font-bold text-gray-700">{et.name}</span>
-                <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-100">
+              <div key={et.id} className="flex items-center justify-between gap-4 p-4 border border-gray-200/80 rounded-[1.25rem] hover:border-indigo-200 hover:shadow-sm bg-white transition-all duration-300">
+                <span className="font-bold text-gray-700 flex-1">{et.name}</span>
+                <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-100 shrink-0">
                   <button onClick={() => onUpdateDistribution(rule.id, et.id, -1)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm text-gray-600 font-bold transition-all">-</button>
                   <span className="font-bold text-gray-900 w-6 text-center">{dist[et.id] || 0}</span>
                   <button onClick={() => onUpdateDistribution(rule.id, et.id, 1)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm text-gray-600 font-bold transition-all">+</button>

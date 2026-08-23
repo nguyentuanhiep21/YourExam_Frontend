@@ -74,5 +74,46 @@ export const createExamApi = {
     }
 
     return res.blob();
+  },
+
+  async saveGeneratedExam(payload: any, userId: string) {
+    const supabase = createClient();
+    
+    // Insert metadata
+    const { data: examData, error: examError } = await supabase.from("GeneratedExams").insert({
+      AuthorId: userId,
+      Title: payload.title || "Đề thi mới",
+      GradeLevel: payload.gradeLevel || 0,
+      Subject: payload.subject || "Chung",
+      DurationMinutes: payload.durationMinutes || 45,
+      TotalScore: payload.totalScore || 10,
+      Difficulty: payload.difficulty || 1,
+      IsPublic: false,
+      DocxFileUrl: "",
+      BlueprintId: payload.blueprintId || null,
+      CreatedAt: payload.createdAt
+    }).select().single();
+
+    if (examError) throw examError;
+
+    // Insert questions
+    const questions = payload.questions.map((q: any, index: number) => ({
+      GeneratedExamId: examData.Id,
+      OrderIndex: index + 1,
+      QuestionType: q.format === "tu-luan" ? 2 : 1,
+      Difficulty: q.difficulty || 1,
+      QuestionContent: q.content,
+      MultipleChoiceOptions: q.choices ? JSON.stringify(q.choices) : null,
+      CorrectAnswer: q.correctAnswer || "",
+      Score: q.score || 1,
+      Explanation: q.explanation || ""
+    }));
+
+    if (questions.length > 0) {
+      const { error: qError } = await supabase.from("GeneratedExamQuestions").insert(questions);
+      if (qError) throw qError;
+    }
+
+    return examData;
   }
 };

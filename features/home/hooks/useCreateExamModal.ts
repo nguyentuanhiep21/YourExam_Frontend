@@ -22,6 +22,8 @@ export const useCreateExamModal = () => {
   const [distributionState, setDistributionState] = useState<Record<string, Record<number, number>>>({});
   const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
   const [isGeneratingExamAPI, setIsGeneratingExamAPI] = useState(false);
+  const [isSavingExam, setIsSavingExam] = useState(false);
+  const [showSaveExamDialog, setShowSaveExamDialog] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
   // Supabase states
@@ -44,7 +46,7 @@ export const useCreateExamModal = () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      
+
       const { data } = await createExamApi.fetchBlueprints(user.id);
       if (data) setSavedBlueprints(data);
     } catch (error) {
@@ -75,18 +77,18 @@ export const useCreateExamModal = () => {
         if (bpError) throw bpError;
         blueprintId = blueprint.Id;
       }
-      
+
       const rulesPayload = customRules.map(q => ({
         BlueprintId: blueprintId as number,
-        Topic: "Câu hỏi tuỳ chỉnh", 
+        Topic: "Câu hỏi tuỳ chỉnh",
         Difficulty: q.diffName === "Dễ" ? QuestionDifficulty.Easy : q.diffName === "Trung bình" ? QuestionDifficulty.Medium : QuestionDifficulty.Hard,
-        QuestionFormat: q.format === "tu-luan" ? QuestionFormat.Essay : QuestionFormat.MultipleChoice, 
+        QuestionFormat: q.format === "tu-luan" ? QuestionFormat.Essay : QuestionFormat.MultipleChoice,
         Quantity: q.quantity
       }));
-      
+
       const { error: rulesError } = await createExamApi.createBlueprintRules(rulesPayload);
       if (rulesError) throw rulesError;
-      
+
       setShowSaveDialog(false);
       setBlueprintName("");
       setEditingBlueprintId(null);
@@ -186,9 +188,9 @@ export const useCreateExamModal = () => {
       const gradeMap: Record<string, number> = {
         "Lớp 1": 1, "Lớp 2": 2, "Lớp 3": 3, "Lớp 4": 4, "Lớp 5": 5
       };
-      
+
       const promises: Promise<any>[] = [];
-      
+
       for (const rule of customRules) {
         const dist = distributionState[rule.id];
         for (const typeIdStr in dist) {
@@ -230,7 +232,7 @@ export const useCreateExamModal = () => {
           errorMsg = res.errorMessage || "Có lỗi xảy ra khi tạo câu hỏi.";
         }
       });
-      
+
       if (hasError) {
         alert(errorMsg);
         setIsGeneratingExamAPI(false);
@@ -242,13 +244,55 @@ export const useCreateExamModal = () => {
         setIsGeneratingExamAPI(false);
         return;
       }
-      
+
       setGeneratedQuestions(allQuestions);
       setIsGeneratingWizard(false);
     } catch (error) {
       alert("Có lỗi xảy ra khi tạo đề thi: " + error);
     } finally {
       setIsGeneratingExamAPI(false);
+    }
+  };
+
+  const handleSaveExamToSupabase = async (details: { title: string, difficulty: number, durationMinutes: number, totalScore: number }) => {
+    if (generatedQuestions.length === 0) return;
+    setIsSavingExam(true);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("Vui lòng đăng nhập để lưu đề thi.");
+        return;
+      }
+
+      const gradeMap: Record<string, number> = {
+        "Lớp 1": 1, "Lớp 2": 2, "Lớp 3": 3, "Lớp 4": 4, "Lớp 5": 5
+      };
+
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const gmt8 = new Date(utc + (3600000 * 8));
+      const createdAt = `${gmt8.getFullYear()}-${String(gmt8.getMonth() + 1).padStart(2, '0')}-${String(gmt8.getDate()).padStart(2, '0')}T${String(gmt8.getHours()).padStart(2, '0')}:${String(gmt8.getMinutes()).padStart(2, '0')}:${String(gmt8.getSeconds()).padStart(2, '0')}+08:00`;
+
+      const payload = {
+        title: details.title,
+        gradeLevel: gradeMap[selectedGrade || "Lớp 1"] || 1,
+        subject: selectedSubject || "Chung",
+        durationMinutes: details.durationMinutes,
+        totalScore: details.totalScore,
+        difficulty: details.difficulty,
+        blueprintId: editingBlueprintId,
+        createdAt: createdAt,
+        questions: generatedQuestions
+      };
+
+      await createExamApi.saveGeneratedExam(payload, user.id);
+      alert("Lưu đề thi vào hệ thống thành công!");
+      setShowSaveExamDialog(false);
+    } catch (error: any) {
+      alert("Lỗi khi lưu đề thi: " + error.message);
+    } finally {
+      setIsSavingExam(false);
     }
   };
 
@@ -259,9 +303,9 @@ export const useCreateExamModal = () => {
       if (selectedSubject && selectedGrade) {
         const subject = selectedSubject.replace(/\s+/g, '');
         const grade = selectedGrade.replace(/\s+/g, '');
-        defaultFileName = `De${subject}${grade}`;
+        defaultFileName = `DeThi${subject}${grade}`;
       }
-      
+
       const payload = {
         fileName: defaultFileName,
         exercises: generatedQuestions.map(q => ({
@@ -290,10 +334,10 @@ export const useCreateExamModal = () => {
 
   return {
     state: {
-      step, selectedGrade, selectedSubject, structureType, deletingId, customRules, isAddingQuestion, isGeneratingQuestion, questionFormat, newExerciseType, isGeneratingWizard, currentRuleIndex, distributionState, generatedQuestions, isGeneratingExamAPI, savedBlueprints, isLoadingBlueprints, blueprintName, editingBlueprintId, isSavingBlueprint, showSaveDialog, canProceed, hasSelectedBoth, isExporting
+      step, selectedGrade, selectedSubject, structureType, deletingId, customRules, isAddingQuestion, isGeneratingQuestion, questionFormat, newExerciseType, isGeneratingWizard, currentRuleIndex, distributionState, generatedQuestions, isGeneratingExamAPI, isSavingExam, showSaveExamDialog, savedBlueprints, isLoadingBlueprints, blueprintName, editingBlueprintId, isSavingBlueprint, showSaveDialog, canProceed, hasSelectedBoth, isExporting
     },
     actions: {
-      setStep, setSelectedGrade, setSelectedSubject, setStructureType, setDeletingId, setCustomRules, setIsAddingQuestion, setIsGeneratingQuestion, setQuestionFormat, setNewExerciseType, setIsGeneratingWizard, setCurrentRuleIndex, setDistributionState, setGeneratedQuestions, setIsGeneratingExamAPI, setSavedBlueprints, setIsLoadingBlueprints, setBlueprintName, setEditingBlueprintId, setIsSavingBlueprint, setShowSaveDialog, fetchBlueprints, saveCustomBlueprint, handleDeleteBlueprint, handleEditBlueprint, handleAddCustomRule, updateQuantity, removeRule, updateDistribution, executeGenerateExam, handleDownloadDocx
+      setStep, setSelectedGrade, setSelectedSubject, setStructureType, setDeletingId, setCustomRules, setIsAddingQuestion, setIsGeneratingQuestion, setQuestionFormat, setNewExerciseType, setIsGeneratingWizard, setCurrentRuleIndex, setDistributionState, setGeneratedQuestions, setIsGeneratingExamAPI, setSavedBlueprints, setIsLoadingBlueprints, setBlueprintName, setEditingBlueprintId, setIsSavingBlueprint, setShowSaveDialog, setShowSaveExamDialog, fetchBlueprints, saveCustomBlueprint, handleDeleteBlueprint, handleEditBlueprint, handleAddCustomRule, updateQuantity, removeRule, updateDistribution, executeGenerateExam, handleSaveExamToSupabase, handleDownloadDocx
     }
   };
 };

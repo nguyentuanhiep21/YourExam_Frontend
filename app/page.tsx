@@ -2,8 +2,33 @@ import Navbar from "@/components/layout/Navbar";
 import { HeroSection } from "@/features/home/components/HeroSection";
 import { ExamCarousel } from "@/features/home/components/ExamCarousel";
 import { trendingExams, newExams } from "@/features/home/mockData";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let myExams: any[] = [];
+  if (user) {
+    const { data } = await supabase
+      .from("GeneratedExams")
+      .select("*")
+      .eq("AuthorId", user.id)
+      .order("CreatedAt", { ascending: false });
+      
+    if (data) {
+      myExams = data.map(exam => ({
+        id: exam.Id.toString(),
+        title: exam.Title || "Đề thi chưa đặt tên",
+        subject: exam.Subject || "Chung",
+        grade: `Lớp ${exam.GradeLevel}`,
+        school: "YourExam",
+        downloads: exam.DownloadCount || 0,
+        upvotes: exam.UpvoteCount || 0,
+        tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean)
+      }));
+    }
+  }
   return (
     <div className="min-h-screen bg-slate-50 relative overflow-hidden flex flex-col">
       {/* Abstract Background Orbs for Premium Glassmorphism Feel */}
@@ -44,6 +69,15 @@ export default function Home() {
             emoji="🆕"
             exams={newExams}
           />
+
+          {user && myExams.length > 0 && (
+            <ExamCarousel 
+              title="Đề thi của bạn" 
+              subtitle="Danh sách các đề thi bạn đã thiết kế và lưu lại"
+              emoji="📚"
+              exams={myExams}
+            />
+          )}
         </div>
       </main>
     </div>

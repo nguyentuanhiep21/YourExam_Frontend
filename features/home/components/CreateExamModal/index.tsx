@@ -11,6 +11,7 @@ import { BasicInfoStep } from "./BasicInfoStep";
 import { StructureStep } from "./StructureStep";
 import { AddQuestionModal } from "./AddQuestionModal";
 import { SaveBlueprintModal } from "./SaveBlueprintModal";
+import { SaveExamModal } from "./SaveExamModal";
 import { GenerationWizardModal } from "./GenerationWizardModal";
 import { ExamPreviewModal } from "./ExamPreviewModal";
 
@@ -173,6 +174,16 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
           isExporting={state.isExporting}
           onSetGeneratedQuestions={actions.setGeneratedQuestions}
           onDownloadDocx={actions.handleDownloadDocx}
+          onSetShowSaveExamDialog={actions.setShowSaveExamDialog}
+        />
+      )}
+
+      {state.showSaveExamDialog && (
+        <SaveExamModal
+          initialTitle={`Đề thi ${state.selectedSubject || "Chung"} ${state.selectedGrade || ""}`.trim()}
+          isSavingExam={state.isSavingExam}
+          onSetShowSaveExamDialog={actions.setShowSaveExamDialog}
+          onSaveExam={actions.handleSaveExamToSupabase}
         />
       )}
     </>,
