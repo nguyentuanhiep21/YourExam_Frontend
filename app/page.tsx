@@ -12,11 +12,27 @@ export default async function Home() {
   if (user) {
     const { data } = await supabase
       .from("GeneratedExams")
-      .select("*")
+      .select("Id, Title, Subject, GradeLevel, DownloadCount, UpvoteCount")
       .eq("AuthorId", user.id)
       .order("CreatedAt", { ascending: false });
       
     if (data) {
+      // Get vote status
+      const examIds = data.map(d => d.Id);
+      let votedExamIds = new Set<number>();
+      
+      if (examIds.length > 0) {
+        const { data: userVotes } = await supabase
+          .from("ExamVotes")
+          .select("ExamId")
+          .eq("UserId", user.id)
+          .in("ExamId", examIds);
+          
+        if (userVotes) {
+          userVotes.forEach(v => votedExamIds.add(v.ExamId));
+        }
+      }
+
       myExams = data.map(exam => ({
         id: exam.Id.toString(),
         title: exam.Title || "Đề thi chưa đặt tên",
@@ -25,7 +41,8 @@ export default async function Home() {
         school: "YourExam",
         downloads: exam.DownloadCount || 0,
         upvotes: exam.UpvoteCount || 0,
-        tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean)
+        tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
+        hasUpvoted: votedExamIds.has(exam.Id)
       }));
     }
   }

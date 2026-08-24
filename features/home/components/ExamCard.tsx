@@ -1,7 +1,10 @@
-import { Download, ArrowUpCircle, FileText } from "lucide-react";
+"use client";
+
+import { Download, ThumbsUp, FileText } from "lucide-react";
 import { ExamMockData } from "../types";
 import Link from "next/link";
-
+import { useState, useEffect } from "react";
+import { upvoteGeneratedExam } from "../../exam/api/exam.actions";
 // Helper function to format numbers (e.g. 12000 -> 12K)
 function formatNumber(num: number): string {
   if (num >= 1000) {
@@ -15,6 +18,56 @@ interface ExamCardProps {
 }
 
 export function ExamCard({ exam }: ExamCardProps) {
+  const [isUpvoting, setIsUpvoting] = useState(false);
+  const [hasUpvoted, setHasUpvoted] = useState(false);
+  const [optimisticUpvoteCount, setOptimisticUpvoteCount] = useState(exam.upvotes);
+
+  useEffect(() => {
+    // Check if user has upvoted this exam in current browser session
+    const upvoted = localStorage.getItem(`upvoted_exam_${exam.id}`);
+    if (upvoted === "true") {
+      setHasUpvoted(true);
+    }
+  }, [exam.id]);
+
+  const handleUpvote = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isUpvoting) return;
+
+    const willUpvote = !hasUpvoted;
+    
+    try {
+      setIsUpvoting(true);
+      setHasUpvoted(willUpvote);
+      setOptimisticUpvoteCount(prev => prev + (willUpvote ? 1 : -1));
+      
+      if (willUpvote) {
+        localStorage.setItem(`upvoted_exam_${exam.id}`, "true");
+      } else {
+        localStorage.removeItem(`upvoted_exam_${exam.id}`);
+      }
+      
+      // Only call real API if the ID is numeric (real data from Supabase)
+      const numericId = parseInt(exam.id, 10);
+      if (!isNaN(numericId)) {
+        await upvoteGeneratedExam(numericId, willUpvote);
+      }
+    } catch (error) {
+      console.error("Lỗi khi upvote:", error);
+      // Rollback
+      setHasUpvoted(!willUpvote);
+      setOptimisticUpvoteCount(prev => prev + (willUpvote ? -1 : 1));
+      if (!willUpvote) {
+        localStorage.setItem(`upvoted_exam_${exam.id}`, "true");
+      } else {
+        localStorage.removeItem(`upvoted_exam_${exam.id}`);
+      }
+    } finally {
+      setIsUpvoting(false);
+    }
+  };
+
   // Determine icon, gradient, and tag color based on subject
   let coverImage = "";
   let coverGradient = "";
@@ -68,17 +121,27 @@ export function ExamCard({ exam }: ExamCardProps) {
 
         {/* Footer: Stats */}
         <div className="flex items-center justify-between mt-8 gap-2">
-          <div className="flex items-center gap-2 bg-emerald-50/50 px-2 py-2 rounded-[1.25rem] border border-emerald-100/50 group-hover:bg-emerald-50 transition-colors flex-1 overflow-hidden">
-            <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
-              <ArrowUpCircle className="w-4 h-4" />
+          <button 
+            onClick={handleUpvote}
+            disabled={isUpvoting}
+            className={`flex items-center gap-2 px-2 py-2 rounded-[1.25rem] border transition-colors flex-1 overflow-hidden disabled:opacity-50 cursor-pointer z-10 ${
+              hasUpvoted 
+                ? 'bg-emerald-500/10 border-emerald-500 hover:bg-emerald-500/20' 
+                : 'bg-emerald-50/50 border-emerald-100/50 hover:bg-emerald-50'
+            }`}
+          >
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center shadow-sm shrink-0 transition-colors ${
+              hasUpvoted ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-600'
+            }`}>
+              <ThumbsUp className={`w-4 h-4 ${hasUpvoted ? 'fill-current' : ''} ${isUpvoting ? 'animate-bounce' : ''}`} />
             </div>
-            <div className="min-w-0">
-              <div className="text-[9px] font-bold text-emerald-600/70 uppercase tracking-wider whitespace-nowrap truncate">Hữu ích</div>
+            <div className="min-w-0 text-left">
+              <div className={`text-[9px] font-bold uppercase tracking-wider whitespace-nowrap truncate ${hasUpvoted ? 'text-emerald-700' : 'text-emerald-600/70'}`}>Hữu ích</div>
               <div className="text-sm font-extrabold text-emerald-900 flex items-center gap-1">
-                {formatNumber(exam.upvotes)} <span className="text-emerald-500 text-[10px]">↑</span>
+                {formatNumber(optimisticUpvoteCount)}
               </div>
             </div>
-          </div>
+          </button>
           
           <div className="flex items-center gap-2 bg-indigo-50/50 px-2 py-2 rounded-[1.25rem] border border-indigo-100/50 group-hover:bg-indigo-50 transition-colors flex-1 overflow-hidden">
             <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm shrink-0">

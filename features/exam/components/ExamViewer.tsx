@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GeneratedExam, UpdateGeneratedExamPayload, UpdateGeneratedExamQuestionPayload, GeneratedExamQuestion } from "../types/exam.types";
 import QuestionList from "./QuestionList";
 import { Clock, BookOpen, BarChart, ThumbsUp, Download, Award, ArrowLeft, Pencil, Save, X, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { updateGeneratedExam } from "../api/exam.actions";
+import { updateGeneratedExam, upvoteGeneratedExam } from "../api/exam.actions";
 
 interface ExamViewerProps {
   exam: GeneratedExam;
@@ -14,6 +14,12 @@ interface ExamViewerProps {
 export default function ExamViewer({ exam }: ExamViewerProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUpvoting, setIsUpvoting] = useState(false);
+  const [optimisticUpvoteCount, setOptimisticUpvoteCount] = useState(exam.UpvoteCount);
+  const [hasUpvoted, setHasUpvoted] = useState(exam.hasUpvoted || false);
+  
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [optimisticDownloadCount, setOptimisticDownloadCount] = useState(exam.DownloadCount);
   
   // Local state for exam metadata
   const [title, setTitle] = useState(exam.Title);
@@ -72,6 +78,76 @@ export default function ExamViewer({ exam }: ExamViewerProps) {
     setTotalScore(exam.TotalScore);
     setEditedQuestions({});
     setIsEditing(false);
+  };
+
+  const handleUpvote = async () => {
+    if (isUpvoting) return;
+    
+    const willUpvote = !hasUpvoted;
+    
+    try {
+      setIsUpvoting(true);
+      setHasUpvoted(willUpvote);
+      setOptimisticUpvoteCount(prev => prev + (willUpvote ? 1 : -1)); // Optimistic UI update
+      
+      await upvoteGeneratedExam(exam.Id, willUpvote);
+    } catch (error) {
+      console.error("Lỗi khi upvote:", error);
+      
+      // Rollback on error
+      setHasUpvoted(!willUpvote);
+      setOptimisticUpvoteCount(prev => prev + (willUpvote ? -1 : 1));
+      
+      alert("Đã xảy ra lỗi khi cập nhật upvote.");
+    } finally {
+      setIsUpvoting(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (isDownloading) return;
+    try {
+      setIsDownloading(true);
+      const subject = exam.Subject?.replace(/\s+/g, '') || "Chung";
+      const grade = exam.GradeLevel || "";
+      const defaultFileName = `DeThi${subject}${grade}`;
+
+      const payload = {
+        fileName: defaultFileName,
+        exercises: (exam.Questions || []).map(q => ({
+          content: q.QuestionContent,
+          choices: q.MultipleChoiceOptions || [],
+          correctAnswer: q.CorrectAnswer,
+          exerciseType: q.ExerciseTypeId || 0
+        }))
+      };
+
+      const { createExamApi } = await import("../../home/api/createExam.api");
+      const blob = await createExamApi.exportToDocx(payload);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${defaultFileName}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Gọi server action để tính lượt tải
+      const { incrementDownloadCount } = await import("../api/exam.actions");
+      const res = await incrementDownloadCount(exam.Id);
+      
+      if (res.newCount) {
+        setOptimisticDownloadCount(res.newCount);
+      }
+    } catch (error: any) {
+      console.error("Lỗi khi tải xuống:", error);
+      if (error.message?.includes("đăng nhập")) {
+        alert("Vui lòng đăng nhập để tải đề thi.");
+      }
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -221,14 +297,26 @@ export default function ExamViewer({ exam }: ExamViewerProps) {
 
           {/* Upvote & Download - Keep visible during editing? Yes, but maybe grayed out or just normal. Normal is fine. */}
           <div className="flex flex-wrap items-center gap-6 mt-8 pt-8 border-t border-gray-100">
-            <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl font-medium shadow-sm hover:shadow-md transition-shadow">
-              <ThumbsUp className="w-4 h-4" />
-              <span>{exam.UpvoteCount} <span className="hidden sm:inline">Upvotes</span></span>
-            </div>
-            <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl font-medium shadow-sm hover:shadow-md transition-shadow">
-              <Download className="w-4 h-4" />
-              <span>{exam.DownloadCount} <span className="hidden sm:inline">Lượt tải</span></span>
-            </div>
+            <button 
+              onClick={handleUpvote}
+              disabled={isUpvoting}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium shadow-sm transition-all disabled:opacity-50 cursor-pointer ${
+                hasUpvoted 
+                  ? "text-white bg-emerald-500 hover:bg-emerald-600 hover:shadow-md" 
+                  : "text-emerald-600 bg-emerald-50 hover:bg-emerald-100 hover:shadow-md"
+              }`}
+            >
+              <ThumbsUp className={`w-4 h-4 ${isUpvoting ? 'animate-bounce' : ''} ${hasUpvoted ? 'fill-current' : ''}`} />
+              <span>{optimisticUpvoteCount} <span className="hidden sm:inline">Upvotes</span></span>
+            </button>
+            <button 
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl font-medium shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 cursor-pointer"
+            >
+              <Download className={`w-4 h-4 ${isDownloading ? 'animate-bounce' : ''}`} />
+              <span>{optimisticDownloadCount} <span className="hidden sm:inline">Lượt tải</span></span>
+            </button>
           </div>
 
         </div>

@@ -39,6 +39,7 @@ export interface GeneratedExam {
 
   // Navigation property for frontend use
   Questions?: GeneratedExamQuestion[];
+  hasUpvoted?: boolean;
 }
 
 export interface UpdateGeneratedExamPayload {

@@ -4,6 +4,14 @@ import { createClient } from "@/lib/supabase/server";
 import { UpdateGeneratedExamPayload, UpdateGeneratedExamQuestionPayload } from "../types/exam.types";
 import { revalidatePath } from "next/cache";
 
+/** Helper to get current time in GMT+7 (Hanoi) ISO format */
+function getHanoiTimeISOString() {
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const gmt7 = new Date(utc + (3600000 * 7));
+  return `${gmt7.getFullYear()}-${String(gmt7.getMonth() + 1).padStart(2, '0')}-${String(gmt7.getDate()).padStart(2, '0')}T${String(gmt7.getHours()).padStart(2, '0')}:${String(gmt7.getMinutes()).padStart(2, '0')}:${String(gmt7.getSeconds()).padStart(2, '0')}+07:00`;
+}
+
 /**
  * Server Action to update an existing generated exam and its questions.
  * Verifies that the current user is the author of the exam before allowing any edits.
@@ -94,3 +102,136 @@ export async function updateGeneratedExam(
 
   return { success: true, message: "Exam updated successfully." };
 }
+
+/**
+ * Server Action to upvote an exam.
+ */
+export async function upvoteGeneratedExam(id: number, increment: boolean = true) {
+  const supabase = await createClient();
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    throw new Error("Vui lòng đăng nhập để thực hiện thao tác này.");
+  }
+
+  // 1. Cập nhật bảng ExamVotes
+  if (increment) {
+    const { error: insertError } = await supabase
+      .from("ExamVotes")
+      .insert({
+        ExamId: id,
+        UserId: user.id,
+        IsUpvote: true,
+        CreatedAt: getHanoiTimeISOString()
+      });
+      
+    if (insertError) {
+      console.error("Error inserting vote:", insertError);
+      throw new Error("Failed to insert vote record");
+    }
+  } else {
+    const { error: deleteError } = await supabase
+      .from("ExamVotes")
+      .delete()
+      .eq("ExamId", id)
+      .eq("UserId", user.id);
+      
+    if (deleteError) {
+      console.error("Error deleting vote:", deleteError);
+      throw new Error("Failed to remove vote record");
+    }
+  }
+
+  // 2. Cập nhật đếm UpvoteCount trên GeneratedExams
+  const { data: exam, error: fetchError } = await supabase
+    .from("GeneratedExams")
+    .select("UpvoteCount")
+    .eq("Id", id)
+    .single();
+
+  if (fetchError || !exam) {
+    throw new Error("Exam not found");
+  }
+
+  const newCount = Math.max(0, exam.UpvoteCount + (increment ? 1 : -1));
+
+  const { error: updateError } = await supabase
+    .from("GeneratedExams")
+    .update({ UpvoteCount: newCount })
+    .eq("Id", id);
+
+  if (updateError) {
+    throw new Error("Failed to upvote exam");
+  }
+
+  revalidatePath(`/exam/${id}`);
+  return { success: true };
+}
+
+/**
+ * Server Action to increment download count.
+ * Prevents spam by checking the ExamDownloads table.
+ */
+export async function incrementDownloadCount(id: number) {
+  const supabase = await createClient();
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    throw new Error("Vui lòng đăng nhập để thực hiện thao tác này.");
+  }
+
+  // 1. Check if user already downloaded
+  const { data: existingDownload, error: checkError } = await supabase
+    .from("ExamDownloads")
+    .select("ExamId")
+    .eq("ExamId", id)
+    .eq("UserId", user.id)
+    .single();
+
+  // If a record exists (no error or checkError is not PGRST116-Not Found), do not increment
+  if (existingDownload) {
+    return { success: true, message: "Already downloaded, count not incremented." };
+  }
+
+  // 2. Insert into ExamDownloads
+  const { error: insertError } = await supabase
+    .from("ExamDownloads")
+    .insert({
+      ExamId: id,
+      UserId: user.id,
+      DownloadedAt: getHanoiTimeISOString()
+    });
+
+  if (insertError) {
+    console.error("Error inserting download record:", insertError);
+    // If it's a unique constraint violation, it means they already downloaded it
+    // We can safely ignore and just return
+    return { success: true, message: "Already downloaded" };
+  }
+
+  // 3. Increment DownloadCount on GeneratedExams
+  const { data: exam, error: fetchError } = await supabase
+    .from("GeneratedExams")
+    .select("DownloadCount")
+    .eq("Id", id)
+    .single();
+
+  if (fetchError || !exam) {
+    throw new Error("Exam not found");
+  }
+
+  const newCount = (exam.DownloadCount || 0) + 1;
+
+  const { error: updateError } = await supabase
+    .from("GeneratedExams")
+    .update({ DownloadCount: newCount })
+    .eq("Id", id);
+
+  if (updateError) {
+    throw new Error("Failed to update download count");
+  }
+
+  revalidatePath(`/exam/${id}`);
+  return { success: true, newCount };
+}
+

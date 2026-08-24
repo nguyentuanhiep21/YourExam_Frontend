@@ -7,4 +7,5 @@ export interface ExamMockData {
   downloads: number;
   upvotes: number;
   tags: string[];
+  hasUpvoted?: boolean;
 }

@@ -22,5 +22,22 @@ export async function getGeneratedExamById(id: number): Promise<GeneratedExam | 
     return null;
   }
 
-  return data as GeneratedExam;
+  const examData = data as GeneratedExam;
+
+  // Check if current user has upvoted
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data: vote } = await supabase
+      .from("ExamVotes")
+      .select("ExamId")
+      .eq("ExamId", id)
+      .eq("UserId", user.id)
+      .single();
+      
+    if (vote) {
+      examData.hasUpvoted = true;
+    }
+  }
+
+  return examData;
 }
