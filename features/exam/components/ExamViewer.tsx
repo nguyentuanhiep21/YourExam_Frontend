@@ -116,9 +116,9 @@ export default function ExamViewer({ exam }: ExamViewerProps) {
         fileName: defaultFileName,
         exercises: (exam.Questions || []).map(q => ({
           content: q.QuestionContent,
-          choices: q.MultipleChoiceOptions || [],
+          choices: q.MultipleChoiceOptions ? JSON.parse(q.MultipleChoiceOptions) : [],
           correctAnswer: q.CorrectAnswer,
-          exerciseType: q.ExerciseTypeId || 0
+          exerciseType: q.QuestionType || 0
         }))
       };
 
