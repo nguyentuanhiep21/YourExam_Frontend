@@ -47,6 +47,7 @@ export interface UpdateGeneratedExamPayload {
   Difficulty?: number;
   DurationMinutes?: number;
   TotalScore?: number;
+  IsPublic?: boolean;
 }
 
 export interface UpdateGeneratedExamQuestionPayload {

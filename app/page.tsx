@@ -1,7 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import { HeroSection } from "@/features/home/components/HeroSection";
 import { ExamCarousel } from "@/features/home/components/ExamCarousel";
-import { trendingExams, newExams } from "@/features/home/mockData";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
@@ -9,6 +8,9 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser();
 
   let myExams: any[] = [];
+  let trendingExams: any[] = [];
+  let newExams: any[] = [];
+
   if (user) {
     const { data } = await supabase
       .from("GeneratedExams")
@@ -73,19 +75,23 @@ export default async function Home() {
         <HeroSection />
         
         <div className="mt-4 mb-24 space-y-12">
-          <ExamCarousel 
-            title="Trending Today" 
-            subtitle="Những đề thi được tải xuống nhiều nhất trong 24h qua"
-            emoji="🔥"
-            exams={trendingExams}
-          />
+          {trendingExams.length > 0 && (
+            <ExamCarousel 
+              title="Trending Today" 
+              subtitle="Những đề thi được tải xuống nhiều nhất trong 24h qua"
+              emoji="🔥"
+              exams={trendingExams}
+            />
+          )}
           
-          <ExamCarousel 
-            title="Mới Cập Nhật" 
-            subtitle="Đề thi vừa được cộng đồng chia sẻ"
-            emoji="🆕"
-            exams={newExams}
-          />
+          {newExams.length > 0 && (
+            <ExamCarousel 
+              title="Mới Cập Nhật" 
+              subtitle="Đề thi vừa được cộng đồng chia sẻ"
+              emoji="🆕"
+              exams={newExams}
+            />
+          )}
 
           {user && myExams.length > 0 && (
             <ExamCarousel 

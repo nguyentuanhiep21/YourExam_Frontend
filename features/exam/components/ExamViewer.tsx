@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { GeneratedExam, UpdateGeneratedExamPayload, UpdateGeneratedExamQuestionPayload, GeneratedExamQuestion } from "../types/exam.types";
 import QuestionList from "./QuestionList";
-import { Clock, BookOpen, BarChart, ThumbsUp, Download, Award, ArrowLeft, Pencil, Save, X, Loader2 } from "lucide-react";
+import { Clock, BookOpen, BarChart, ThumbsUp, Download, Award, ArrowLeft, Pencil, Save, X, Loader2, Globe, Lock, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { updateGeneratedExam, upvoteGeneratedExam } from "../api/exam.actions";
 
@@ -26,6 +26,8 @@ export default function ExamViewer({ exam }: ExamViewerProps) {
   const [duration, setDuration] = useState(exam.DurationMinutes);
   const [difficulty, setDifficulty] = useState(exam.Difficulty);
   const [totalScore, setTotalScore] = useState(exam.TotalScore);
+  const [isPublic, setIsPublic] = useState(exam.IsPublic);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   // Local state for questions
   const [editedQuestions, setEditedQuestions] = useState<Record<number, Partial<GeneratedExamQuestion>>>({});
@@ -49,6 +51,7 @@ export default function ExamViewer({ exam }: ExamViewerProps) {
       if (duration !== exam.DurationMinutes) examPayload.DurationMinutes = duration;
       if (difficulty !== exam.Difficulty) examPayload.Difficulty = difficulty;
       if (totalScore !== exam.TotalScore) examPayload.TotalScore = totalScore;
+      if (isPublic !== exam.IsPublic) examPayload.IsPublic = isPublic;
       
       const questionsPayload: UpdateGeneratedExamQuestionPayload[] = Object.entries(editedQuestions).map(([idStr, updates]) => ({
         Id: parseInt(idStr, 10),
@@ -76,6 +79,7 @@ export default function ExamViewer({ exam }: ExamViewerProps) {
     setDuration(exam.DurationMinutes);
     setDifficulty(exam.Difficulty);
     setTotalScore(exam.TotalScore);
+    setIsPublic(exam.IsPublic);
     setEditedQuestions({});
     setIsEditing(false);
   };
@@ -208,6 +212,65 @@ export default function ExamViewer({ exam }: ExamViewerProps) {
             <span className="inline-flex items-center justify-center px-3 py-1 text-xs font-semibold tracking-wide text-fuchsia-700 bg-fuchsia-100 rounded-full">
               Lớp {exam.GradeLevel}
             </span>
+            {isEditing ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold tracking-wide rounded-full border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 ${
+                    isPublic 
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" 
+                      : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                  }`}
+                >
+                  {isPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                  {isPublic ? 'Công khai' : 'Riêng tư'}
+                  <ChevronDown className={`w-3.5 h-3.5 opacity-70 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {isDropdownOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsDropdownOpen(false)}
+                    />
+                    <div className="absolute top-full left-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200 origin-top-left">
+                      <button
+                        type="button"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-gray-50 text-emerald-700 font-medium transition-colors"
+                        onClick={() => {
+                          setIsPublic(true);
+                          setIsDropdownOpen(false);
+                        }}
+                      >
+                        <Globe className="w-4 h-4" />
+                        Công khai
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-gray-50 text-slate-700 font-medium transition-colors"
+                        onClick={() => {
+                          setIsPublic(false);
+                          setIsDropdownOpen(false);
+                        }}
+                      >
+                        <Lock className="w-4 h-4" />
+                        Riêng tư
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold tracking-wide rounded-full border ${
+                isPublic 
+                  ? 'text-emerald-700 bg-emerald-50 border-emerald-200' 
+                  : 'text-slate-700 bg-slate-50 border-slate-200'
+              }`}>
+                {isPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                {isPublic ? 'Công khai' : 'Riêng tư'}
+              </span>
+            )}
           </div>
 
           {isEditing ? (
