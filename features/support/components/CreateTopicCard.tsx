@@ -1,24 +1,49 @@
 "use client";
 
 import { useState } from "react";
-import { Send, Image as ImageIcon } from "lucide-react";
+import { Send, Image as ImageIcon, X } from "lucide-react";
 import { Profile } from "../types";
+import { useRef } from "react";
 
 interface CreateTopicCardProps {
-  currentUser?: Profile;
-  onSubmit: (title: string, content: string) => void;
+  currentUser?: Profile | null;
+  isSubmitting?: boolean;
+  onSubmit: (title: string, content: string, imageFile: File | null) => void;
 }
 
-export function CreateTopicCard({ currentUser, onSubmit }: CreateTopicCardProps) {
+export function CreateTopicCard({ currentUser, isSubmitting, onSubmit }: CreateTopicCardProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
-    onSubmit(title, content);
+    onSubmit(title, content, imageFile);
     setTitle("");
     setContent("");
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
@@ -59,22 +84,45 @@ export function CreateTopicCard({ currentUser, onSubmit }: CreateTopicCardProps)
                 className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all placeholder:text-gray-400 resize-y"
               />
               
+              {imagePreview && (
+                <div className="relative inline-block mt-2">
+                  <img src={imagePreview} alt="Preview" className="h-32 object-contain rounded-lg border border-gray-200" />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 text-gray-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+              
               <div className="flex items-center justify-between pt-2">
-                <button 
-                  type="button"
-                  className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                  title="Đính kèm hình ảnh"
-                >
-                  <ImageIcon className="w-5 h-5" />
-                </button>
+                <div>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    title="Đính kèm hình ảnh"
+                  >
+                    <ImageIcon className="w-5 h-5" />
+                  </button>
+                </div>
                 
                 <button 
                   type="submit"
-                  disabled={!title.trim() || !content.trim()}
+                  disabled={!title.trim() || !content.trim() || isSubmitting}
                   className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-indigo-700 hover:shadow-[0_8px_16px_rgba(79,70,229,0.2)] transition-all disabled:opacity-50 disabled:hover:shadow-none disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
-                  Đăng bài
+                  {isSubmitting ? "Đang đăng..." : "Đăng bài"}
                 </button>
               </div>
             </div>

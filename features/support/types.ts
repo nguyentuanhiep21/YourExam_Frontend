@@ -22,5 +22,6 @@ export interface Topic {
   AuthorId: string;
   Author?: Profile;
   CreatedAt: string; // ISO date string
+  ImageUrl?: string;
   Comments?: TopicComment[];
 }

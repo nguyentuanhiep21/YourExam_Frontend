@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/client";
 import { CustomRule } from "../types/createExam.types";
 import { EXERCISE_TYPES, SUBJECT_CODE_MAP, getExerciseTypes, QuestionFormat, QuestionDifficulty } from "../constants/createExam.constants";
 import { createExamApi } from "../api/createExam.api";
+import { getGmt7IsoString } from "@/utils/time";
 
 export const useCreateExamModal = () => {
   const [step, setStep] = useState(1);
@@ -269,10 +270,7 @@ export const useCreateExamModal = () => {
         "Lớp 1": 1, "Lớp 2": 2, "Lớp 3": 3, "Lớp 4": 4, "Lớp 5": 5
       };
 
-      const now = new Date();
-      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-      const gmt7 = new Date(utc + (3600000 * 7));
-      const createdAt = `${gmt7.getFullYear()}-${String(gmt7.getMonth() + 1).padStart(2, '0')}-${String(gmt7.getDate()).padStart(2, '0')}T${String(gmt7.getHours()).padStart(2, '0')}:${String(gmt7.getMinutes()).padStart(2, '0')}:${String(gmt7.getSeconds()).padStart(2, '0')}+07:00`;
+      const createdAt = getGmt7IsoString();
 
       const payload = {
         title: details.title,

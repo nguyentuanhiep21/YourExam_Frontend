@@ -53,16 +53,6 @@ export function CommentCard({ comment, isLast = false }: CommentCardProps) {
         <div className="text-sm text-gray-700 leading-relaxed pl-11">
           {comment.Content}
         </div>
-        
-        {/* Actions */}
-        <div className="flex items-center gap-4 mt-3 pl-11">
-          <button className="text-xs font-semibold text-gray-500 hover:text-indigo-600 transition-colors">
-            Thích
-          </button>
-          <button className="text-xs font-semibold text-gray-500 hover:text-indigo-600 transition-colors">
-            Phản hồi
-          </button>
-        </div>
       </div>
     </div>
   );

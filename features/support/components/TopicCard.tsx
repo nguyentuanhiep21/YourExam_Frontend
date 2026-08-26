@@ -42,16 +42,17 @@ export function TopicCard({ topic }: TopicCardProps) {
         <p className="text-base text-gray-700 leading-relaxed mb-6 whitespace-pre-wrap">
           {topic.Content}
         </p>
+
+        {topic.ImageUrl && (
+          <div className="mb-6 rounded-xl overflow-hidden border border-gray-200">
+            <img src={topic.ImageUrl} alt="Đính kèm" className="max-h-96 w-auto object-contain bg-gray-50 mx-auto" />
+          </div>
+        )}
         
         <div className="flex items-center gap-4 border-t border-gray-100 pt-4">
           <button className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all">
             <MessageSquare className="w-4 h-4" />
             {commentCount} Bình luận
-          </button>
-          
-          <button className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-fuchsia-600 bg-gray-50 hover:bg-fuchsia-50 px-4 py-2 rounded-xl transition-all">
-            <Share2 className="w-4 h-4" />
-            Chia sẻ
           </button>
         </div>
       </div>

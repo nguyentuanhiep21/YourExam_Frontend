@@ -3,14 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { UpdateGeneratedExamPayload, UpdateGeneratedExamQuestionPayload } from "../types/exam.types";
 import { revalidatePath } from "next/cache";
-
-/** Helper to get current time in GMT+7 (Hanoi) ISO format */
-function getHanoiTimeISOString() {
-  const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  const gmt7 = new Date(utc + (3600000 * 7));
-  return `${gmt7.getFullYear()}-${String(gmt7.getMonth() + 1).padStart(2, '0')}-${String(gmt7.getDate()).padStart(2, '0')}T${String(gmt7.getHours()).padStart(2, '0')}:${String(gmt7.getMinutes()).padStart(2, '0')}:${String(gmt7.getSeconds()).padStart(2, '0')}+07:00`;
-}
+import { getGmt7IsoString } from "@/utils/time";
 
 /**
  * Server Action to update an existing generated exam and its questions.
@@ -122,7 +115,7 @@ export async function upvoteGeneratedExam(id: number, increment: boolean = true)
         ExamId: id,
         UserId: user.id,
         IsUpvote: true,
-        CreatedAt: getHanoiTimeISOString()
+        CreatedAt: getGmt7IsoString()
       });
       
     if (insertError) {
@@ -199,7 +192,7 @@ export async function incrementDownloadCount(id: number) {
     .insert({
       ExamId: id,
       UserId: user.id,
-      DownloadedAt: getHanoiTimeISOString()
+      DownloadedAt: getGmt7IsoString()
     });
 
   if (insertError) {
