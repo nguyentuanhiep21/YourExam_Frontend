@@ -1,7 +1,7 @@
 "use client";
 
 import { useRegisterForm } from "../hooks/useRegisterForm";
-import { RegisterFormView } from "../views/RegisterFormView";
+import { RegisterFormView } from "./RegisterFormView";
 
 /**
  * RegisterForm — Container (Logic Layer).

@@ -35,13 +35,13 @@ export function ExamCarousel({ title, subtitle, exams, emoji }: ExamCarouselProp
 
         {/* Desktop Navigation Buttons */}
         <div className="hidden sm:flex items-center gap-2">
-          <button 
+          <button
             onClick={() => scroll("left")}
             className="p-3 rounded-full border border-gray-200/80 bg-white/80 backdrop-blur-sm text-gray-600 hover:bg-white hover:text-indigo-600 hover:border-indigo-200 hover:shadow-[0_8px_16px_rgba(99,102,241,0.15)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 shadow-sm"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <button 
+          <button
             onClick={() => scroll("right")}
             className="p-3 rounded-full border border-gray-200/80 bg-white/80 backdrop-blur-sm text-gray-600 hover:bg-white hover:text-indigo-600 hover:border-indigo-200 hover:shadow-[0_8px_16px_rgba(99,102,241,0.15)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 shadow-sm"
           >
@@ -51,7 +51,7 @@ export function ExamCarousel({ title, subtitle, exams, emoji }: ExamCarouselProp
       </div>
 
       {/* Scrollable Container */}
-      <div 
+      <div
         ref={scrollRef}
         className="flex overflow-x-auto gap-6 pb-6 pt-2 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}

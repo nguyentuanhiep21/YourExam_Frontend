@@ -1,25 +1,38 @@
 "use client";
 
+import Link from "next/link";
 import InputField from "@/components/ui/InputField";
-import type { ResetPasswordFormViewProps } from "../types";
+import type { ForgotPasswordFormViewProps } from "../types/auth.types";
 
-export function ResetPasswordView({
-  password,
-  confirmPassword,
+export function ForgotPasswordView({
+  email,
   loading,
   error,
   isSuccess,
-  onPasswordChange,
-  onConfirmPasswordChange,
+  onEmailChange,
   onSubmit,
-}: ResetPasswordFormViewProps) {
+}: ForgotPasswordFormViewProps) {
   return (
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-[28px] font-bold tracking-tight text-[#0f0c29]">Đặt mật khẩu mới 🔑</h2>
-        <p className="mt-1.5 text-sm text-gray-500">Vui lòng nhập mật khẩu mới cho tài khoản của bạn</p>
+        <h2 className="text-[28px] font-bold tracking-tight text-[#0f0c29]">Quên mật khẩu? 🔒</h2>
+        <p className="mt-1.5 text-sm text-gray-500">Nhập email của bạn để nhận liên kết đặt lại mật khẩu</p>
       </div>
+
+      {/* Success banner */}
+      {isSuccess && (
+        <div className="mb-6 flex gap-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+          <div className="flex-shrink-0 mt-0.5">
+            <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <p className="text-sm text-emerald-700 leading-relaxed">
+            Đã gửi liên kết khôi phục. Vui lòng kiểm tra hộp thư email của bạn.
+          </p>
+        </div>
+      )}
 
       {/* Error banner */}
       {error && (
@@ -36,24 +49,13 @@ export function ResetPasswordView({
       {/* Form */}
       <form onSubmit={onSubmit} className="space-y-4">
         <InputField
-          id="new-password"
-          label="Mật khẩu mới"
-          type="password"
+          id="reset-email"
+          label="Email"
+          type="email"
           required
-          value={password}
-          onChange={onPasswordChange}
-          placeholder="••••••••"
-          disabled={isSuccess}
-        />
-
-        <InputField
-          id="confirm-new-password"
-          label="Xác nhận mật khẩu mới"
-          type="password"
-          required
-          value={confirmPassword}
-          onChange={onConfirmPasswordChange}
-          placeholder="••••••••"
+          value={email}
+          onChange={onEmailChange}
+          placeholder="giaovien@truong.edu.vn"
           disabled={isSuccess}
         />
 
@@ -74,13 +76,31 @@ export function ResetPasswordView({
                   Đang xử lý...
                 </span>
               ) : (
-                "Đổi mật khẩu"
+                "Gửi liên kết"
               )}
             </span>
             <div className="absolute inset-0 bg-white opacity-0 hover:opacity-10 transition-opacity duration-200" />
           </button>
         </div>
       </form>
+
+      {/* Divider */}
+      <div className="relative my-7">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-100" />
+        </div>
+      </div>
+
+      {/* Back to login */}
+      <p className="text-center text-sm text-gray-500">
+        Đã nhớ lại mật khẩu?{" "}
+        <Link
+          href="/login"
+          className="font-semibold text-violet-600 hover:text-violet-700 transition-colors"
+        >
+          Đăng nhập ngay →
+        </Link>
+      </p>
     </div>
   );
 }

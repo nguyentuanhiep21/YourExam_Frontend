@@ -1,7 +1,7 @@
 "use client";
 
 import { useResetPasswordForm } from "../hooks/useResetPasswordForm";
-import { ResetPasswordView } from "../views/ResetPasswordView";
+import { ResetPasswordView } from "./ResetPasswordView";
 
 export function ResetPasswordForm() {
   const { password, setPassword, confirmPassword, setConfirmPassword, loading, error, handleSubmit } = useResetPasswordForm();

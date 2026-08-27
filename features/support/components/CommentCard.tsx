@@ -1,6 +1,6 @@
 "use client";
 
-import { TopicComment } from "../types";
+import { TopicComment } from "../types/support.types";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { CornerDownRight, MoreHorizontal } from "lucide-react";

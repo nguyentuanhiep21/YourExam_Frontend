@@ -1,6 +1,6 @@
 "use client";
 
-import type { SignOutButtonViewProps } from "../types";
+import type { SignOutButtonViewProps } from "../types/auth.types";
 
 /**
  * SignOutButtonView — Thuần giao diện (Presentation Layer).

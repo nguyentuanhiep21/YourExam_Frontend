@@ -1,7 +1,7 @@
 "use client";
 
 import { useForgotPasswordForm } from "../hooks/useForgotPasswordForm";
-import { ForgotPasswordView } from "../views/ForgotPasswordView";
+import { ForgotPasswordView } from "./ForgotPasswordView";
 
 export function ForgotPasswordForm() {
   const { email, setEmail, loading, error, isSuccess, handleSubmit } = useForgotPasswordForm();

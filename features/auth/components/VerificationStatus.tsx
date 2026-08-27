@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { VerificationStatusView } from "../views/VerificationStatusView";
+import { VerificationStatusView } from "./VerificationStatusView";
 import { useEffect, useState } from "react";
 
 /**

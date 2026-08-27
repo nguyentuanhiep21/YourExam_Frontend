@@ -1,7 +1,7 @@
 "use client";
 
 import { useLoginForm } from "../hooks/useLoginForm";
-import { LoginFormView } from "../views/LoginFormView";
+import { LoginFormView } from "./LoginFormView";
 
 /**
  * LoginForm — Container (Logic Layer).

@@ -1,6 +1,6 @@
 "use client";
 
-import { Topic } from "../types";
+import { Topic } from "../types/support.types";
 import { TopicCard } from "./TopicCard";
 import { CommentCard } from "./CommentCard";
 import { useState } from "react";
@@ -8,9 +8,18 @@ import { useState } from "react";
 interface TopicThreadProps {
   topic: Topic;
   onCreateComment?: (topicId: number, content: string) => Promise<void>;
+  currentUserId?: string;
+  isSaved?: boolean;
+  onToggleSave?: () => void;
 }
 
-export function TopicThread({ topic, onCreateComment }: TopicThreadProps) {
+export function TopicThread({ 
+  topic, 
+  onCreateComment,
+  currentUserId,
+  isSaved,
+  onToggleSave
+}: TopicThreadProps) {
   const [replyContent, setReplyContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,7 +40,12 @@ export function TopicThread({ topic, onCreateComment }: TopicThreadProps) {
   return (
     <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Main Topic */}
-      <TopicCard topic={topic} />
+      <TopicCard 
+        topic={topic} 
+        currentUserId={currentUserId}
+        isSaved={isSaved}
+        onToggleSave={onToggleSave}
+      />
       
       {/* Comments List */}
       {topic.Comments && topic.Comments.length > 0 && (

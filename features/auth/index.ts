@@ -19,4 +19,4 @@ export type {
   LoginFormViewProps,
   RegisterFormViewProps,
   SignOutButtonViewProps,
-} from "./types";
+} from "./types/auth.types";

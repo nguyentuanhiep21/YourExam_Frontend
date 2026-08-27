@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import { Topic, TopicComment } from "../types";
+import { Topic, TopicComment } from "../types/support.types";
 import { getGmt7IsoString } from "@/utils/time";
 
 export const supportApi = {
@@ -77,5 +77,43 @@ export const supportApi = {
       .getPublicUrl(fileName);
 
     return data.publicUrl;
+  },
+
+  saveTopic: async (topicId: number, userId: string): Promise<void> => {
+    const supabase = createClient();
+    const savedAt = getGmt7IsoString();
+
+    const { error } = await supabase
+      .from("SavedTopics")
+      .insert({
+        TopicId: topicId,
+        UserId: userId,
+        SavedAt: savedAt
+      });
+
+    if (error) throw new Error(error.message);
+  },
+
+  unsaveTopic: async (topicId: number, userId: string): Promise<void> => {
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from("SavedTopics")
+      .delete()
+      .match({ TopicId: topicId, UserId: userId });
+
+    if (error) throw new Error(error.message);
+  },
+
+  getSavedTopics: async (userId: string): Promise<number[]> => {
+    const supabase = createClient();
+    
+    const { data, error } = await supabase
+      .from("SavedTopics")
+      .select("TopicId")
+      .eq("UserId", userId);
+      
+    if (error) throw new Error(error.message);
+    return data.map((d: any) => d.TopicId);
   }
 };

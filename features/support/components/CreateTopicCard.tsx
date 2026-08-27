@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Send, Image as ImageIcon, X } from "lucide-react";
-import { Profile } from "../types";
+import { Profile } from "../types/support.types";
 import { useRef } from "react";
 
 interface CreateTopicCardProps {

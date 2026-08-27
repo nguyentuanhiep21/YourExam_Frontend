@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "../hooks/useAuth";
-import { SignOutButtonView } from "../views/SignOutButtonView";
+import { SignOutButtonView } from "./SignOutButtonView";
 
 /**
  * SignOutButton — Container (Logic Layer).

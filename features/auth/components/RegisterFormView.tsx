@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import InputField from "@/components/ui/InputField";
-import type { RegisterFormViewProps } from "../types";
+import type { RegisterFormViewProps } from "../types/auth.types";
 
 /**
  * RegisterFormView — Thuần giao diện (Presentation Layer).
