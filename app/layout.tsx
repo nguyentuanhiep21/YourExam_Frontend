@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin", "vietnamese"],
 });
 
@@ -20,9 +20,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${nunito.variable} h-full antialiased font-sans`}
+      className={`${inter.variable} h-full antialiased font-sans`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        {children}
+      </body>
     </html>
   );
 }

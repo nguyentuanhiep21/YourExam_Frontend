@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Bell, Search, BookOpen, Users, MessageCircleQuestion } from "lucide-react";
+import { UserDropdown } from "./UserDropdown";
+import { NavLinks } from "./NavLinks";
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -20,21 +22,7 @@ export default async function Navbar() {
           </Link>
 
           {/* Desktop Navigation (Centered) */}
-          <div className="hidden md:flex items-center justify-center gap-8 flex-1">
-            <Link href="/" className="text-sm font-semibold text-violet-700 relative">
-              Tài liệu
-              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-violet-600 rounded-full"></span>
-            </Link>
-            <Link href="/courses" className="text-sm font-semibold text-gray-700 hover:text-violet-700 transition-colors">
-              Khóa học
-            </Link>
-            <Link href="/community" className="text-sm font-semibold text-gray-700 hover:text-violet-700 transition-colors">
-              Cộng đồng
-            </Link>
-            <Link href="/support" className="text-sm font-semibold text-gray-700 hover:text-violet-700 transition-colors">
-              Hỗ trợ
-            </Link>
-          </div>
+          <NavLinks />
 
           {/* User Actions */}
           <div className="flex items-center justify-end gap-4 min-w-[150px]">
@@ -44,11 +32,7 @@ export default async function Navbar() {
                   <Bell className="w-5 h-5" />
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                 </button>
-                <Link href="/" className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 text-white flex items-center justify-center font-semibold text-sm shadow-sm ring-2 ring-white cursor-pointer hover:opacity-90 transition-opacity">
-                    {user.email?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                </Link>
+                <UserDropdown email={user.email || ""} />
               </div>
             ) : (
               <div className="flex items-center gap-3">
