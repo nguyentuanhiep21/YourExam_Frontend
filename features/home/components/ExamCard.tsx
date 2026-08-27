@@ -1,7 +1,7 @@
 "use client";
 
 import { Download, ThumbsUp, FileText } from "lucide-react";
-import { ExamMockData } from "../types";
+import { ExamMockData } from "../types/home.types";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { upvoteGeneratedExam } from "../../exam/api/exam.actions";
@@ -40,7 +40,7 @@ export function ExamCard({ exam }: ExamCardProps) {
     try {
       setIsUpvoting(true);
       setHasUpvoted(willUpvote);
-      setOptimisticUpvoteCount(prev => prev + (willUpvote ? 1 : -1));
+      setOptimisticUpvoteCount((prev: number) => prev + (willUpvote ? 1 : -1));
 
       if (willUpvote) {
         localStorage.setItem(`upvoted_exam_${exam.id}`, "true");
@@ -57,7 +57,7 @@ export function ExamCard({ exam }: ExamCardProps) {
       console.error("Lỗi khi upvote:", error);
       // Rollback
       setHasUpvoted(!willUpvote);
-      setOptimisticUpvoteCount(prev => prev + (willUpvote ? -1 : 1));
+      setOptimisticUpvoteCount((prev: number) => prev + (willUpvote ? -1 : 1));
       if (!willUpvote) {
         localStorage.setItem(`upvoted_exam_${exam.id}`, "true");
       } else {

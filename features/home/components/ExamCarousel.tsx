@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ExamMockData } from "../types";
+import { ExamMockData } from "../types/home.types";
 import { ExamCard } from "./ExamCard";
 
 interface ExamCarouselProps {
