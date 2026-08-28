@@ -4,20 +4,23 @@ import { Topic } from "../types/support.types";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import { MessageSquare, MoreHorizontal, Share2, Bookmark } from "lucide-react";
+import { MessageSquare, MoreHorizontal, Share2, Bookmark, Trash2 } from "lucide-react";
 
 interface TopicCardProps {
   topic: Topic;
   currentUserId?: string;
   isSaved?: boolean;
   onToggleSave?: () => void;
+  onDelete?: () => void;
+  isCommentsVisible?: boolean;
+  onToggleComments?: () => void;
 }
 
-export function TopicCard({ topic, currentUserId, isSaved, onToggleSave }: TopicCardProps) {
+export function TopicCard({ topic, currentUserId, isSaved, onToggleSave, onDelete, isCommentsVisible, onToggleComments }: TopicCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const timeAgo = formatDistanceToNow(new Date(topic.CreatedAt), { addSuffix: true, locale: vi });
-  const commentCount = topic.Comments?.length || 0;
+  const commentCount = topic.CommentCount || topic.Comments?.length || 0;
   
   const isOwnPost = currentUserId === topic.AuthorId;
 
@@ -72,7 +75,19 @@ export function TopicCard({ topic, currentUserId, isSaved, onToggleSave }: Topic
                     <Bookmark className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} />
                     {isSaved ? "Bỏ lưu chủ đề" : "Lưu chủ đề"}
                   </button>
-                  {/* Future menu items like Report, Delete can go here */}
+                  {isOwnPost && onDelete && (
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onDelete();
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-3 hover:bg-red-50 hover:text-red-600 text-red-500 mt-1"
+                      title="Xóa chủ đề này"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Xóa bài viết
+                    </button>
+                  )}
                 </div>
               </div>
             </>
@@ -95,7 +110,14 @@ export function TopicCard({ topic, currentUserId, isSaved, onToggleSave }: Topic
         )}
         
         <div className="flex items-center gap-4 border-t border-gray-100 pt-4">
-          <button className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all">
+          <button 
+            onClick={onToggleComments}
+            className={`inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl transition-all ${
+              isCommentsVisible 
+                ? 'text-indigo-600 bg-indigo-50' 
+                : 'text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50'
+            }`}
+          >
             <MessageSquare className="w-4 h-4" />
             {commentCount} Bình luận
           </button>
