@@ -3,14 +3,19 @@
 import { TopicComment } from "../types/support.types";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import { CornerDownRight, MoreHorizontal } from "lucide-react";
+import { CornerDownRight, MoreHorizontal, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 interface CommentCardProps {
   comment: TopicComment;
   isLast?: boolean;
+  currentUserId?: string;
+  onDelete?: () => void;
 }
 
-export function CommentCard({ comment, isLast = false }: CommentCardProps) {
+export function CommentCard({ comment, isLast = false, currentUserId, onDelete }: CommentCardProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isOwnComment = currentUserId === comment.AuthorId;
   const timeAgo = formatDistanceToNow(new Date(comment.CreatedAt), { addSuffix: true, locale: vi });
 
   return (
@@ -45,9 +50,41 @@ export function CommentCard({ comment, isLast = false }: CommentCardProps) {
             </div>
           </div>
           
-          <button className="text-gray-400 hover:text-indigo-600 p-1 rounded-md hover:bg-indigo-50 transition-colors">
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-400 hover:text-indigo-600 p-1 rounded-md hover:bg-indigo-50 transition-colors"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+            {isMenuOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-10" 
+                  onClick={() => setIsMenuOpen(false)}
+                />
+                <div className="absolute top-full right-0 mt-1 w-40 bg-white/90 backdrop-blur-2xl rounded-xl shadow-xl shadow-gray-200/50 border border-gray-100 z-20 p-1 origin-top-right animate-in fade-in zoom-in-95 duration-200">
+                  <div className="flex flex-col gap-1">
+                    {isOwnComment && onDelete ? (
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          onDelete();
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 hover:bg-red-50 hover:text-red-600 text-red-500"
+                        title="Xóa bình luận này"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Xóa bình luận
+                      </button>
+                    ) : (
+                      <div className="px-3 py-2 text-xs text-gray-400 font-medium">Không có hành động</div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
         
         <div className="text-sm text-gray-700 leading-relaxed pl-11">
