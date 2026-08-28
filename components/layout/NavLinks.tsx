@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/", label: "Tài liệu" },
-  { href: "/courses", label: "Khóa học" },
-  { href: "/community", label: "Cộng đồng" },
-  { href: "/support", label: "Hỗ trợ" },
+  { href: "/", label: "Trang chủ" },
+  { href: "/documents", label: "Tài liệu" },
+  { href: "/exams", label: "Đề thi" },
+  { href: "/support", label: "Diễn đàn" },
 ];
 
 export function NavLinks() {

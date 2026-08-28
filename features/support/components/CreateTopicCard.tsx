@@ -70,14 +70,14 @@ export function CreateTopicCard({ currentUser, isSubmitting, onSubmit }: CreateT
             <div className="flex-1 space-y-4">
               <input 
                 type="text" 
-                placeholder="Tiêu đề (Vấn đề bạn đang gặp phải?)" 
+                placeholder="Tiêu đề (Chủ đề bạn muốn thảo luận?)" 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all placeholder:text-gray-400"
               />
               
               <textarea 
-                placeholder="Mô tả chi tiết nội dung cần hỗ trợ..." 
+                placeholder="Mô tả chi tiết nội dung cần thảo luận..." 
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={4}

@@ -1,61 +1,43 @@
-import { Search, ChevronDown } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { CreateExamButton } from "./CreateExamButton";
+import Link from "next/link";
+import { ArrowRight, FileText } from "lucide-react";
 
-export async function HeroSection() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const categories = ["Toán học", "Tiếng Việt"];
-
+export function HeroSection() {
   return (
-    <section className="relative w-full pt-20 pb-16 overflow-hidden">
+    <section className="relative w-full pt-28 pb-20 overflow-hidden">
       {/* Background gradients */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-50 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-50/50 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-        <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-gray-900 mb-8 max-w-3xl leading-[1.1]">
-          Khám phá & <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">Chinh phục tri thức</span>
-        </h1>
-
-        {/* Search Bar */}
-        <div className="w-full max-w-2xl mb-8">
-          <div className="relative flex items-center bg-white/80 backdrop-blur-2xl border border-white/80 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] rounded-full p-2.5 group hover:shadow-[0_20px_60px_-15px_rgba(139,92,246,0.15)] hover:border-indigo-200/50 transition-all duration-500">
-            <div className="pl-5 pr-3 flex items-center pointer-events-none text-indigo-400 group-focus-within:text-indigo-600 transition-colors">
-              <Search className="h-6 w-6" />
-            </div>
-            <input
-              type="text"
-              className="flex-1 bg-transparent py-3 text-lg text-gray-900 placeholder:text-gray-400 outline-none w-full"
-              placeholder="Tìm kiếm khóa học, đề thi hoặc chủ đề..."
-            />
-            <button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:shadow-[0_8px_20px_rgba(99,102,241,0.3)] hover:-translate-y-0.5 active:scale-95 text-white px-8 py-3.5 rounded-full text-base font-bold transition-all duration-300 ml-2">
-              Tìm kiếm
-            </button>
-          </div>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-sm font-semibold mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <span className="flex h-2 w-2 rounded-full bg-indigo-600 animate-pulse"></span>
+          Phiên bản Beta đã ra mắt
         </div>
 
-        {/* Action & Filter Container */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-2">
-          {user && (
-            <>
-              {/* Create Exam Action */}
-              <CreateExamButton />
+        <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 max-w-4xl leading-[1.1] font-heading animate-in fade-in slide-in-from-bottom-5 duration-700">
+          Nền tảng Ôn thi và <br className="hidden md:block" />
+          <span className="text-indigo-600">Chia sẻ Tài liệu</span> Toàn diện
+        </h1>
 
-              <div className="w-px h-8 bg-gray-300 hidden sm:block"></div>
-            </>
-          )}
+        <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
+          Tạo đề thi từ file, luyện thi trực tuyến, và cùng cộng đồng giải đáp mọi thắc mắc để đạt kết quả tốt nhất.
+        </p>
 
-          {/* Quick Filter Pills */}
-          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl">
-            {categories.map((cat) => (
-              <button 
-                key={cat}
-                className="px-6 py-2.5 rounded-full bg-white/80 backdrop-blur-md text-gray-700 text-sm font-bold border border-white/80 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 hover:text-indigo-700 hover:border-indigo-200 hover:shadow-[0_8px_16px_rgba(99,102,241,0.1)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 shadow-sm"
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-7 duration-700 delay-300">
+          <Link
+            href="/create-exam"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl text-base font-bold transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
+          >
+            Tạo đề thi ngay
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+
+          <Link
+            href="/documents"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 hover:border-slate-300 px-8 py-4 rounded-2xl text-base font-bold transition-all active:scale-95"
+          >
+            <FileText className="w-5 h-5 text-slate-400" />
+            Khám phá tài liệu
+          </Link>
         </div>
       </div>
     </section>

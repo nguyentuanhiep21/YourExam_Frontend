@@ -14,6 +14,7 @@ interface TopicThreadProps {
   onToggleSave?: () => void;
   onDelete?: () => void;
   onDeleteComment?: (commentId: number) => void;
+  onLoadMoreComments?: (topicId: number, page: number) => Promise<void>;
 }
 
 export function TopicThread({ 
