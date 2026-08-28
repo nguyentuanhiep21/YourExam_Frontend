@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { supportApi } from "../api/support.api";
 import { Topic, TopicComment, Profile } from "../types/support.types";
 import { createClient } from "@/lib/supabase/client";
@@ -9,11 +10,20 @@ export function useSupport() {
   const [error, setError] = useState<string | null>(null);
   const [savedTopicIds, setSavedTopicIds] = useState<number[]>([]);
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
+  const [totalTopics, setTotalTopics] = useState(0);
+
+  const searchParams = useSearchParams();
+  const pageStr = searchParams.get('page');
+  const page = pageStr ? parseInt(pageStr, 10) : 1;
+  const limit = 5;
 
   useEffect(() => {
-    fetchTopics();
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    fetchTopics(page, limit);
+  }, [page]);
 
   const fetchUser = async () => {
     const supabase = createClient();
@@ -28,11 +38,12 @@ export function useSupport() {
     }
   };
 
-  const fetchTopics = async () => {
+  const fetchTopics = async (p: number, l: number) => {
     try {
       setLoading(true);
-      const data = await supportApi.getTopics();
+      const { topics: data, total } = await supportApi.getTopics(p, l);
       setTopics(data);
+      setTotalTopics(total);
       setError(null);
     } catch (err: any) {
       setError(err.message);
@@ -61,12 +72,32 @@ export function useSupport() {
         if (topic.Id === topicId) {
           return {
             ...topic,
-            Comments: [...(topic.Comments || []), newComment]
+            Comments: [...(topic.Comments || []), newComment],
+            CommentCount: (topic.CommentCount || topic.Comments?.length || 0) + 1
           };
         }
         return topic;
       }));
       return newComment;
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const loadMoreComments = async (topicId: number, page: number) => {
+    try {
+      const moreComments = await supportApi.getTopicComments(topicId, page, 10);
+      setTopics(prev => prev.map(topic => {
+        if (topic.Id === topicId) {
+          const existingIds = new Set((topic.Comments || []).map(c => c.Id));
+          const uniqueNew = moreComments.filter(c => !existingIds.has(c.Id));
+          return {
+            ...topic,
+            Comments: [...(topic.Comments || []), ...uniqueNew]
+          };
+        }
+        return topic;
+      }));
     } catch (err: any) {
       throw err;
     }
@@ -138,15 +169,50 @@ export function useSupport() {
     }
   };
 
+  const removeTopic = async (topicId: number) => {
+    if (!currentUser) throw new Error("Vui lòng đăng nhập.");
+    try {
+      await supportApi.deleteTopic(topicId, currentUser.Id);
+      setTopics(prev => prev.filter(t => t.Id !== topicId));
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const removeComment = async (topicId: number, commentId: number) => {
+    if (!currentUser) throw new Error("Vui lòng đăng nhập.");
+    try {
+      await supportApi.deleteComment(commentId, currentUser.Id, topicId);
+      setTopics(prev => prev.map(topic => {
+        if (topic.Id === topicId && topic.Comments) {
+          return {
+            ...topic,
+            Comments: topic.Comments.filter(c => c.Id !== commentId),
+            CommentCount: Math.max(0, (topic.CommentCount || topic.Comments?.length || 0) - 1)
+          };
+        }
+        return topic;
+      }));
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
   return { 
     topics, 
     loading, 
     error,
     savedTopicIds,
     currentUser,
+    totalTopics,
+    page,
+    limit,
     addTopic,
     addComment,
+    removeTopic,
+    removeComment,
+    loadMoreComments,
     toggleSaveTopic,
-    refreshTopics: fetchTopics 
+    refreshTopics: () => fetchTopics(page, limit)
   };
 }

@@ -24,4 +24,5 @@ export interface Topic {
   CreatedAt: string; // ISO date string
   ImageUrl?: string;
   Comments?: TopicComment[];
+  CommentCount?: number;
 }
