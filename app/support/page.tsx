@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Navbar from "@/components/layout/Navbar";
 import { SupportClient } from "@/features/support/components/SupportClient";
 
@@ -13,7 +14,9 @@ export default function SupportPage() {
 
       <Navbar />
       
-      <SupportClient />
+      <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>}>
+        <SupportClient />
+      </Suspense>
     </div>
   );
 }

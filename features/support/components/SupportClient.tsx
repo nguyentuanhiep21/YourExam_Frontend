@@ -3,18 +3,23 @@
 import { useState } from "react";
 import { CreateTopicCard } from "./CreateTopicCard";
 import { TopicThread } from "./TopicThread";
+import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
+import { Pagination } from "./Pagination";
 import { HelpCircle, Loader2, ChevronDown, Check } from "lucide-react";
 import { useSupport } from "../hooks/useSupport";
 
 export function SupportClient() {
   const { 
     topics, loading, error, currentUser, savedTopicIds,
-    addTopic, addComment, toggleSaveTopic 
+    totalTopics, page, limit,
+    addTopic, addComment, removeTopic, removeComment, loadMoreComments, toggleSaveTopic 
   } = useSupport();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"recent" | "saved" | "posted">("recent");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ type: 'topic' | 'comment', topicId: number, commentId?: number } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const tabs = [
     { id: "recent", label: "Các chủ đề gần đây" },
@@ -49,6 +54,31 @@ export function SupportClient() {
     }
   };
 
+  const handleDeleteTopic = (topicId: number) => {
+    setItemToDelete({ type: 'topic', topicId });
+  };
+
+  const handleDeleteComment = (topicId: number, commentId: number) => {
+    setItemToDelete({ type: 'comment', topicId, commentId });
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      setIsDeleting(true);
+      if (itemToDelete.type === 'topic') {
+        await removeTopic(itemToDelete.topicId);
+      } else if (itemToDelete.type === 'comment' && itemToDelete.commentId) {
+        await removeComment(itemToDelete.topicId, itemToDelete.commentId);
+      }
+      setItemToDelete(null);
+    } catch (err: any) {
+      alert(err.message || "Đã xảy ra lỗi khi xóa.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <main className="relative z-10 flex-1 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -57,10 +87,10 @@ export function SupportClient() {
         <div className="mb-10 text-center sm:text-left">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 flex items-center justify-center sm:justify-start gap-3 mb-4 tracking-tight">
             <HelpCircle className="w-10 h-10 text-indigo-600" />
-            Trung tâm Hỗ trợ
+            Diễn đàn
           </h1>
           <p className="text-lg text-gray-600 font-medium max-w-2xl">
-            Bạn có câu hỏi, báo lỗi hay góp ý? Hãy đăng chủ đề tại đây để được đội ngũ quản trị viên và cộng đồng YourExam hỗ trợ nhanh chóng nhất.
+            Bạn có câu hỏi, báo lỗi hay góp ý? Hãy đăng chủ đề tại đây để cùng cộng đồng YourExam thảo luận và giải đáp.
           </p>
         </div>
 
@@ -135,20 +165,45 @@ export function SupportClient() {
               );
             }
 
-            return filteredTopics.map(topic => (
-              <TopicThread 
-                key={topic.Id} 
-                topic={topic} 
-                onCreateComment={handleCreateComment}
-                currentUserId={currentUser?.Id}
-                isSaved={savedTopicIds.includes(topic.Id)}
-                onToggleSave={() => handleToggleSave(topic.Id)}
-              />
-            ));
+            return (
+              <>
+                {filteredTopics.map(topic => (
+                  <TopicThread 
+                    key={topic.Id} 
+                    topic={topic} 
+                    onCreateComment={handleCreateComment}
+                    currentUserId={currentUser?.Id}
+                    isSaved={savedTopicIds.includes(topic.Id)}
+                    onToggleSave={() => handleToggleSave(topic.Id)}
+                    onDelete={() => handleDeleteTopic(topic.Id)}
+                    onDeleteComment={(commentId) => handleDeleteComment(topic.Id, commentId)}
+                    onLoadMoreComments={loadMoreComments}
+                  />
+                ))}
+                
+                {/* Phân trang chỉ hiển thị ở tab Tất cả (recent) nếu dữ liệu được phân trang từ server */}
+                {activeTab === "recent" && totalTopics > limit && (
+                  <Pagination 
+                    currentPage={page} 
+                    totalItems={totalTopics} 
+                    itemsPerPage={limit} 
+                  />
+                )}
+              </>
+            );
           })()}
         </div>
 
       </div>
+
+      <ConfirmDeleteDialog 
+        isOpen={itemToDelete !== null}
+        isDeleting={isDeleting}
+        title={itemToDelete?.type === 'comment' ? "Xóa bình luận?" : "Xóa bài viết?"}
+        description={itemToDelete?.type === 'comment' ? "Bạn có chắc chắn muốn xóa bình luận này không?" : "Bạn có chắc chắn muốn xóa chủ đề này không? Hành động này không thể hoàn tác."}
+        onClose={() => setItemToDelete(null)}
+        onConfirm={confirmDelete}
+      />
     </main>
   );
 }
