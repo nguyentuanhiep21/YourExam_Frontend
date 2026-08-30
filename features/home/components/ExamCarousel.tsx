@@ -23,7 +23,7 @@ export function ExamCarousel({ title, subtitle, exams, emoji }: ExamCarouselProp
   };
 
   return (
-    <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex items-end justify-between mb-6">
         <div>
           <h2 className="text-3xl font-extrabold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent flex items-center gap-3 tracking-tight">
