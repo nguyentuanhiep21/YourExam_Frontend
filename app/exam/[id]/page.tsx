@@ -1,5 +1,6 @@
 import { getGeneratedExamById } from "@/features/exam/api/exam.api";
 import ExamViewer from "@/features/exam/components/ExamViewer";
+import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
@@ -36,9 +37,13 @@ export default async function ExamPage({ params }: ExamPageProps) {
     notFound();
   }
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const currentUserId = user?.id || null;
+
   return (
     <main className="min-h-screen bg-gray-50 py-8">
-      <ExamViewer exam={exam} />
+      <ExamViewer exam={exam} currentUserId={currentUserId} />
     </main>
   );
 }

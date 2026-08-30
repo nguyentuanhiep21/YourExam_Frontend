@@ -2,29 +2,46 @@
 
 import { useState } from "react";
 import { GeneratedExamQuestion, QuestionType } from "../types/exam.types";
-import { Eye, EyeOff, BookOpen } from "lucide-react";
+import { Eye, EyeOff, BookOpen, Send } from "lucide-react";
 
 interface QuestionListProps {
   questions: GeneratedExamQuestion[];
-  isEditing?: boolean;
+  totalScore?: number;
+  mode?: 'view' | 'edit' | 'take' | 'review';
   editedQuestions?: Record<number, Partial<GeneratedExamQuestion>>;
   onQuestionChange?: (id: number, updates: Partial<GeneratedExamQuestion>) => void;
+  userAnswers?: Record<number, string>;
+  onAnswerChange?: (id: number, answer: string) => void;
+  onSubmit?: () => void;
+  timerElement?: React.ReactNode;
 }
 
-export default function QuestionList({ questions, isEditing, editedQuestions, onQuestionChange }: QuestionListProps) {
+export default function QuestionList({ 
+  questions, 
+  totalScore,
+  mode = 'view', 
+  editedQuestions, 
+  onQuestionChange,
+  userAnswers,
+  onAnswerChange,
+  onSubmit,
+  timerElement
+}: QuestionListProps) {
   const [showAnswers, setShowAnswers] = useState(false);
 
   if (!questions || questions.length === 0) {
     return <p className="text-gray-500">Chưa có câu hỏi nào trong đề thi này.</p>;
   }
 
-  // Sắp xếp câu hỏi theo OrderIndex
   const sortedQuestions = [...questions].sort((a, b) => a.OrderIndex - b.OrderIndex);
+
+  const scorePerQuestion = totalScore !== undefined && questions.length > 0 ? totalScore / questions.length : 0;
+  const formattedScorePerQuestion = scorePerQuestion % 1 === 0 ? scorePerQuestion : Number(scorePerQuestion.toFixed(2));
 
   const renderQuestionContent = (q: GeneratedExamQuestion) => {
     const isMultipleChoice = q.QuestionType === QuestionType.MultipleChoice;
 
-    if (isEditing) {
+    if (mode === 'edit') {
       const editData = editedQuestions?.[q.Id] || {};
       const contentValue = editData.QuestionContent ?? q.QuestionContent;
       const answerValue = editData.CorrectAnswer ?? (q.CorrectAnswer || "");
@@ -33,11 +50,8 @@ export default function QuestionList({ questions, isEditing, editedQuestions, on
       let options: string[] = [];
       try {
         options = JSON.parse(optionsJson);
-      } catch {
-        // fallback
-      }
+      } catch {}
       
-      // Đảm bảo luôn có 4 lựa chọn cho câu trắc nghiệm
       if (isMultipleChoice) {
         while (options.length < 4) options.push("");
       }
@@ -107,43 +121,132 @@ export default function QuestionList({ questions, isEditing, editedQuestions, on
       );
     }
 
-    // --- Read-only Mode ---
     const content = q.QuestionContent;
     
-    // For multiple choice, we don't replace blanks with the answer text, we just highlight the option below.
-    if (isMultipleChoice || !showAnswers || !q.CorrectAnswer) {
-      return content;
+    if (isMultipleChoice) {
+      return <div>{content}</div>;
     }
 
-    // Try to replace blanks (___ or ...)
+    // Essay logic
     const blankRegex = /_{2,}|\.{3,}/;
     if (blankRegex.test(content)) {
       const parts = content.split(blankRegex);
       return (
-        <>
-          {parts.map((part, i) => (
-            <span key={i}>
-              {part}
-              {i < parts.length - 1 && (
-                <span className="text-rose-500 font-bold px-2 underline decoration-rose-200 decoration-2 underline-offset-4">
-                  {q.CorrectAnswer}
+        <span className="leading-loose">
+          {parts.map((part, i) => {
+            if (i === parts.length - 1) return <span key={i}>{part}</span>;
+            
+            if (mode === 'take') {
+              return (
+                <span key={i}>
+                  {part}
+                  <input
+                    type="text"
+                    className="mx-2 px-3 py-1 bg-indigo-50/50 border-b-2 border-indigo-300 focus:border-indigo-600 outline-none text-indigo-900 font-semibold w-32 sm:w-48 transition-colors text-center inline-block"
+                    value={userAnswers?.[q.Id] || ''}
+                    onChange={(e) => onAnswerChange?.(q.Id, e.target.value)}
+                    placeholder="Nhập..."
+                  />
                 </span>
-              )}
-            </span>
-          ))}
-        </>
+              );
+            }
+            
+            if (mode === 'review') {
+              const userAnswer = userAnswers?.[q.Id] || '';
+              const correctAns = q.CorrectAnswer || '';
+              const isCorrect = userAnswer.trim().toLowerCase() === correctAns.trim().toLowerCase();
+              
+              if (isCorrect) {
+                return (
+                  <span key={i}>
+                    {part}
+                    <span className="text-emerald-600 font-bold px-2 underline decoration-emerald-300 decoration-2 underline-offset-4">
+                      {userAnswer || '____'}
+                    </span>
+                  </span>
+                );
+              } else {
+                return (
+                  <span key={i}>
+                    {part}
+                    <span className="text-rose-600 font-bold px-2 underline decoration-rose-300 decoration-2 underline-offset-4 line-through">
+                      {userAnswer || '____'}
+                    </span>
+                    <span className="text-emerald-600 font-bold px-2 underline decoration-emerald-300 decoration-2 underline-offset-4 ml-2">
+                      {correctAns}
+                    </span>
+                  </span>
+                );
+              }
+            }
+
+            // 'view'
+            return (
+              <span key={i}>
+                {part}
+                <span className={`font-bold px-2 underline decoration-2 underline-offset-4 ${showAnswers && q.CorrectAnswer ? 'text-emerald-600 decoration-emerald-300' : 'text-gray-400 decoration-gray-300'}`}>
+                  {showAnswers && q.CorrectAnswer ? q.CorrectAnswer : "____"}
+                </span>
+              </span>
+            );
+          })}
+        </span>
       );
     }
     
-    // If no blank is found (e.g. regular essay question), append the answer below
+    // Regular essay question
     return (
-      <>
-        {content}
-        <div className="mt-3 p-3 bg-rose-50/80 border border-rose-100 rounded-lg text-rose-600 font-medium">
-          <span className="font-bold mr-2">Đáp án:</span>
-          {q.CorrectAnswer}
-        </div>
-      </>
+      <div className="space-y-4">
+        <div>{content}</div>
+        
+        {mode === 'take' && (
+          <textarea
+            className="w-full p-4 bg-indigo-50/30 border-2 border-indigo-100 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all resize-y min-h-[120px]"
+            value={userAnswers?.[q.Id] || ''}
+            onChange={(e) => onAnswerChange?.(q.Id, e.target.value)}
+            placeholder="Nhập câu trả lời của bạn vào đây..."
+          />
+        )}
+        
+        {mode === 'review' && (
+          <div className="space-y-3 mt-4 border-t border-gray-100 pt-4">
+            {(() => {
+              const userAnswer = userAnswers?.[q.Id] || '';
+              const correctAns = q.CorrectAnswer || '';
+              const isCorrect = userAnswer.trim().toLowerCase() === correctAns.trim().toLowerCase();
+              
+              if (isCorrect) {
+                return (
+                  <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-xl text-emerald-700">
+                    <span className="font-bold mr-2">Đáp án của bạn (Đúng):</span>
+                    <div className="mt-2 whitespace-pre-wrap">{userAnswer}</div>
+                  </div>
+                );
+              } else {
+                return (
+                  <>
+                    <div className="p-4 bg-rose-50/80 border border-rose-200 rounded-xl text-rose-700">
+                      <span className="font-bold mr-2">Đáp án của bạn (Sai):</span>
+                      <div className="mt-2 whitespace-pre-wrap">{userAnswer || <span className="italic opacity-70">Không có câu trả lời</span>}</div>
+                    </div>
+                    <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-xl text-emerald-700">
+                      <span className="font-bold mr-2">Đáp án chuẩn:</span>
+                      <div className="mt-2 whitespace-pre-wrap">{correctAns}</div>
+                    </div>
+                  </>
+                );
+              }
+            })()}
+          </div>
+        )}
+
+        {mode === 'view' && showAnswers && q.CorrectAnswer && (
+          <div className="mt-4 p-4 bg-emerald-50/80 border border-emerald-200 rounded-xl text-emerald-700 font-medium">
+            <span className="font-bold mr-2">Đáp án:</span>
+            <div className="mt-2 whitespace-pre-wrap">{q.CorrectAnswer}</div>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -154,7 +257,8 @@ export default function QuestionList({ questions, isEditing, editedQuestions, on
           <BookOpen className="w-6 h-6 text-indigo-500" />
           Danh sách câu hỏi
         </h2>
-        {!isEditing && (
+        
+        {mode === 'view' && (
           <button
             onClick={() => setShowAnswers(!showAnswers)}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl font-semibold transition-colors shadow-sm shrink-0"
@@ -163,14 +267,25 @@ export default function QuestionList({ questions, isEditing, editedQuestions, on
             {showAnswers ? "Ẩn đáp án" : "Hiển thị đáp án"}
           </button>
         )}
+
+        {mode === 'take' && timerElement && (
+          <div className="shrink-0">
+            {timerElement}
+          </div>
+        )}
       </div>
 
       {sortedQuestions.map((q, index) => (
-        <div key={q.Id} className="p-5 border border-gray-100 rounded-[1.5rem] shadow-sm bg-white hover:shadow-md transition-shadow">
+        <div key={q.Id} className={`p-5 rounded-[1.5rem] shadow-sm transition-shadow ${
+          mode === 'review' ? (
+            // Thêm màu viền cho toàn câu hỏi nếu làm đúng/sai ở chế độ review? Tạm thời giữ nguyên hoặc nhạt
+            "bg-white border border-gray-200"
+          ) : "bg-white border border-gray-100 hover:shadow-md"
+        }`}>
           <div className="flex justify-between items-start mb-3">
             <h3 className="font-bold text-lg text-gray-900">Câu {index + 1}</h3>
             <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
-              {q.Score} điểm
+              {formattedScorePerQuestion} điểm
             </span>
           </div>
           
@@ -178,7 +293,7 @@ export default function QuestionList({ questions, isEditing, editedQuestions, on
             {renderQuestionContent(q)}
           </div>
 
-          {!isEditing && q.QuestionType === QuestionType.MultipleChoice && q.MultipleChoiceOptions && (
+          {mode !== 'edit' && q.QuestionType === QuestionType.MultipleChoice && q.MultipleChoiceOptions && (
             <div className="mt-5 pl-4 border-l-2 border-indigo-200">
               {(() => {
                 try {
@@ -194,33 +309,93 @@ export default function QuestionList({ questions, isEditing, editedQuestions, on
                     gridClass += "grid-cols-1";
                   }
 
-                  const getIsCorrect = (opt: string, i: number) => {
-                    if (!showAnswers || !q.CorrectAnswer) return false;
+                  const getChoiceClass = (opt: string, i: number) => {
                     const char = String.fromCharCode(65 + i);
-                    return q.CorrectAnswer.trim().toUpperCase() === char || q.CorrectAnswer.trim() === opt.trim();
+                    
+                    if (mode === 'take') {
+                      const isSelected = userAnswers?.[q.Id] === char;
+                      return isSelected 
+                        ? "bg-indigo-50 border-indigo-300 shadow-sm ring-1 ring-indigo-500" 
+                        : "bg-gray-50/50 border-transparent hover:border-indigo-200 hover:bg-gray-50 cursor-pointer";
+                    }
+                    
+                    if (mode === 'review') {
+                      const isCorrect = q.CorrectAnswer?.trim().toUpperCase() === char || q.CorrectAnswer?.trim() === opt.trim();
+                      const isUserSelected = userAnswers?.[q.Id] === char;
+                      
+                      if (isCorrect) return "bg-emerald-50/80 border-emerald-300 shadow-sm"; 
+                      if (isUserSelected) return "bg-rose-50/80 border-rose-300 shadow-sm";
+                      return "bg-gray-50/50 border-transparent opacity-60";
+                    }
+                    
+                    const isCorrect = showAnswers && q.CorrectAnswer && (q.CorrectAnswer.trim().toUpperCase() === char || q.CorrectAnswer.trim() === opt.trim());
+                    return isCorrect 
+                      ? "bg-emerald-50/80 border-emerald-300 shadow-sm" 
+                      : "bg-gray-50/50 border-transparent hover:border-indigo-100 hover:bg-indigo-50/50";
+                  };
+
+                  const getChoiceIconClass = (opt: string, i: number) => {
+                    const char = String.fromCharCode(65 + i);
+                    
+                    if (mode === 'take') {
+                      const isSelected = userAnswers?.[q.Id] === char;
+                      return isSelected 
+                        ? "bg-indigo-600 text-white border-indigo-600" 
+                        : "bg-white text-gray-700 border-gray-200";
+                    }
+                    
+                    if (mode === 'review') {
+                      const isCorrect = q.CorrectAnswer?.trim().toUpperCase() === char || q.CorrectAnswer?.trim() === opt.trim();
+                      const isUserSelected = userAnswers?.[q.Id] === char;
+                      
+                      if (isCorrect) return "bg-emerald-500 text-white border-emerald-600";
+                      if (isUserSelected) return "bg-rose-500 text-white border-rose-600";
+                      return "bg-white text-gray-400 border-gray-200";
+                    }
+
+                    const isCorrect = showAnswers && q.CorrectAnswer && (q.CorrectAnswer.trim().toUpperCase() === char || q.CorrectAnswer.trim() === opt.trim());
+                    return isCorrect
+                      ? "bg-emerald-500 text-white border-emerald-600"
+                      : "bg-white text-gray-700 border-gray-200";
+                  };
+                  
+                  const getChoiceTextClass = (opt: string, i: number) => {
+                    const char = String.fromCharCode(65 + i);
+                    
+                    if (mode === 'take') {
+                      return userAnswers?.[q.Id] === char ? "text-indigo-900 font-bold" : "text-gray-700";
+                    }
+                    
+                    if (mode === 'review') {
+                      const isCorrect = q.CorrectAnswer?.trim().toUpperCase() === char || q.CorrectAnswer?.trim() === opt.trim();
+                      const isUserSelected = userAnswers?.[q.Id] === char;
+                      
+                      if (isCorrect) return "text-emerald-700 font-bold";
+                      if (isUserSelected) return "text-rose-700 font-bold";
+                      return "text-gray-500";
+                    }
+                    
+                    const isCorrect = showAnswers && q.CorrectAnswer && (q.CorrectAnswer.trim().toUpperCase() === char || q.CorrectAnswer.trim() === opt.trim());
+                    return isCorrect ? "text-emerald-700 font-bold" : "text-gray-700";
                   };
 
                   return (
                     <div className={gridClass}>
                       {options.map((opt, i) => {
-                        const isCorrect = getIsCorrect(opt, i);
                         return (
                           <div 
                             key={i} 
-                            className={`flex items-start space-x-3 p-3 rounded-xl border transition-all ${
-                              isCorrect 
-                                ? "bg-rose-50/80 border-rose-200 shadow-sm" 
-                                : "bg-gray-50/50 border-transparent hover:border-indigo-100 hover:bg-indigo-50/50"
-                            }`}
+                            onClick={() => {
+                              if (mode === 'take') {
+                                onAnswerChange?.(q.Id, String.fromCharCode(65 + i));
+                              }
+                            }}
+                            className={`flex items-start space-x-3 p-3 rounded-xl border transition-all select-none ${getChoiceClass(opt, i)}`}
                           >
-                            <div className={`w-7 h-7 rounded-full border flex items-center justify-center text-sm font-bold shrink-0 shadow-sm ${
-                              isCorrect
-                                ? "bg-rose-400 text-white border-rose-500"
-                                : "bg-white text-gray-700 border-gray-200"
-                            }`}>
+                            <div className={`w-7 h-7 rounded-full border flex items-center justify-center text-sm font-bold shrink-0 shadow-sm transition-colors ${getChoiceIconClass(opt, i)}`}>
                               {String.fromCharCode(65 + i)}
                             </div>
-                            <span className={`leading-snug pt-0.5 ${isCorrect ? "text-rose-600 font-bold" : "text-gray-700"}`}>
+                            <span className={`leading-snug pt-0.5 transition-colors ${getChoiceTextClass(opt, i)}`}>
                               {opt}
                             </span>
                           </div>
@@ -236,6 +411,18 @@ export default function QuestionList({ questions, isEditing, editedQuestions, on
           )}
         </div>
       ))}
+      
+      {mode === 'take' && (
+        <div className="flex justify-center mt-12 mb-8 animate-in fade-in slide-in-from-bottom-4">
+          <button
+            onClick={onSubmit}
+            className="flex items-center gap-2 px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-lg"
+          >
+            <Send className="w-5 h-5" />
+            Nộp bài thi
+          </button>
+        </div>
+      )}
     </div>
   );
 }
