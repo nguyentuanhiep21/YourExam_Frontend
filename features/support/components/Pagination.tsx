@@ -57,7 +57,7 @@ export function Pagination({ currentPage, totalItems, itemsPerPage }: Pagination
     return pages.map((page, index) => {
       if (page === "...") {
         return (
-          <span key={`dots-${index}`} className="px-3 py-2 text-slate-400">
+          <span key={`dots-${index}`} className="px-3 py-2 text-slate-400 font-body">
             <MoreHorizontal className="w-5 h-5" />
           </span>
         );
@@ -68,9 +68,9 @@ export function Pagination({ currentPage, totalItems, itemsPerPage }: Pagination
         <button
           key={`page-${page}`}
           onClick={() => handlePageChange(page as number)}
-          className={`w-10 h-10 flex items-center justify-center rounded-xl font-semibold transition-all ${
+          className={`w-10 h-10 flex items-center justify-center rounded-xl font-semibold transition-all font-body ${
             isCurrent
-              ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
+              ? "bg-primary text-white shadow-md shadow-primary/30"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >

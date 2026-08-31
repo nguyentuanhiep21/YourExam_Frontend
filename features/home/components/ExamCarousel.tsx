@@ -26,24 +26,24 @@ export function ExamCarousel({ title, subtitle, exams, emoji }: ExamCarouselProp
     <section className="py-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex items-end justify-between mb-6">
         <div>
-          <h2 className="text-3xl font-extrabold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent flex items-center gap-3 tracking-tight">
+          <h2 className="text-3xl font-extrabold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent flex items-center gap-3 tracking-tight font-heading leading-relaxed py-1">
             {emoji && <span className="text-3xl drop-shadow-sm">{emoji}</span>}
             {title}
           </h2>
-          {subtitle && <p className="text-gray-500 mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-slate-500 mt-1 font-body">{subtitle}</p>}
         </div>
 
         {/* Desktop Navigation Buttons */}
         <div className="hidden sm:flex items-center gap-2">
           <button
             onClick={() => scroll("left")}
-            className="p-3 rounded-full border border-gray-200/80 bg-white/80 backdrop-blur-sm text-gray-600 hover:bg-white hover:text-indigo-600 hover:border-indigo-200 hover:shadow-[0_8px_16px_rgba(99,102,241,0.15)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 shadow-sm"
+            className="p-3 rounded-full border border-slate-200/80 bg-white/80 backdrop-blur-sm text-slate-600 hover:bg-primary/5 hover:text-primary hover:border-primary/30 hover:shadow-[0_8px_16px_rgba(37,99,235,0.15)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 shadow-sm"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={() => scroll("right")}
-            className="p-3 rounded-full border border-gray-200/80 bg-white/80 backdrop-blur-sm text-gray-600 hover:bg-white hover:text-indigo-600 hover:border-indigo-200 hover:shadow-[0_8px_16px_rgba(99,102,241,0.15)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 shadow-sm"
+            className="p-3 rounded-full border border-slate-200/80 bg-white/80 backdrop-blur-sm text-slate-600 hover:bg-primary/5 hover:text-primary hover:border-primary/30 hover:shadow-[0_8px_16px_rgba(37,99,235,0.15)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300 shadow-sm"
           >
             <ChevronRight className="w-6 h-6" />
           </button>

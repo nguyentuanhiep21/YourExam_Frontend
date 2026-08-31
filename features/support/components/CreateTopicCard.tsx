@@ -47,23 +47,23 @@ export function CreateTopicCard({ currentUser, isSubmitting, onSubmit }: CreateT
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-sm border border-indigo-50/50 p-6 sm:p-8 transition-all hover:shadow-md mb-8 relative overflow-hidden">
+    <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-sm border border-primary/20 p-6 sm:p-8 transition-all hover:shadow-[0_20px_40px_-15px_rgba(37,99,235,0.1)] hover:border-primary/40 mb-8 relative overflow-hidden group">
       {/* Decorative gradient */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-[80px] -mr-32 -mt-32 opacity-70 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none group-hover:bg-primary/10 transition-colors duration-700"></div>
 
       <div className="relative z-10">
-        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <h2 className="text-xl font-bold font-heading text-slate-900 mb-6 flex items-center gap-2">
           Tạo chủ đề mới
         </h2>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 font-body">
           <div className="flex gap-4">
             {/* Avatar */}
             <div className="hidden sm:block shrink-0 mt-1">
               <img 
                 src={currentUser?.AvatarUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest"} 
                 alt="Avatar" 
-                className="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-gray-50"
+                className="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-50"
               />
             </div>
             
@@ -73,7 +73,7 @@ export function CreateTopicCard({ currentUser, isSubmitting, onSubmit }: CreateT
                 placeholder="Tiêu đề (Chủ đề bạn muốn thảo luận?)" 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all placeholder:text-gray-400"
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400"
               />
               
               <textarea 
@@ -81,16 +81,16 @@ export function CreateTopicCard({ currentUser, isSubmitting, onSubmit }: CreateT
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={4}
-                className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all placeholder:text-gray-400 resize-y"
+                className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-slate-400 resize-y"
               />
               
               {imagePreview && (
                 <div className="relative inline-block mt-2">
-                  <img src={imagePreview} alt="Preview" className="h-32 object-contain rounded-lg border border-gray-200" />
+                  <img src={imagePreview} alt="Preview" className="h-32 object-contain rounded-lg border border-slate-200" />
                   <button
                     type="button"
                     onClick={handleRemoveImage}
-                    className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 text-gray-600"
+                    className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md hover:bg-slate-100 text-slate-600"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -109,7 +109,7 @@ export function CreateTopicCard({ currentUser, isSubmitting, onSubmit }: CreateT
                   <button 
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
                     title="Đính kèm hình ảnh"
                   >
                     <ImageIcon className="w-5 h-5" />
@@ -119,7 +119,7 @@ export function CreateTopicCard({ currentUser, isSubmitting, onSubmit }: CreateT
                 <button 
                   type="submit"
                   disabled={!title.trim() || !content.trim() || isSubmitting}
-                  className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-indigo-700 hover:shadow-[0_8px_16px_rgba(79,70,229,0.2)] transition-all disabled:opacity-50 disabled:hover:shadow-none disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 bg-primary text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-primary-hover hover:shadow-[0_8px_16px_rgba(37,99,235,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:hover:shadow-none disabled:hover:translate-y-0 disabled:active:scale-100 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
                   {isSubmitting ? "Đang đăng..." : "Đăng bài"}

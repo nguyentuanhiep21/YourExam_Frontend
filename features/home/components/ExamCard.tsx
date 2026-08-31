@@ -75,21 +75,21 @@ export function ExamCard({ exam }: ExamCardProps) {
 
   if (exam.subject.includes("Toán") || exam.subject.includes("Math")) {
     coverImage = "/images/icon-math.png";
-    coverGradient = "bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF]"; // Soft indigo/blue gradient
-    tagTextColor = "text-indigo-700";
+    coverGradient = "bg-primary-light/50"; // Soft primary background
+    tagTextColor = "text-primary";
   } else if (exam.subject.includes("Việt") || exam.subject.includes("Viet")) {
     coverImage = "/images/icon-vietnamese.png";
-    coverGradient = "bg-gradient-to-br from-orange-50 to-amber-100";
-    tagTextColor = "text-amber-700";
+    coverGradient = "bg-orange-50/80"; // Soft accent background
+    tagTextColor = "text-accent";
   } else {
     // Default fallback
     coverImage = "/images/icon-math.png";
-    coverGradient = "bg-gradient-to-br from-gray-50 to-gray-100";
-    tagTextColor = "text-gray-700";
+    coverGradient = "bg-slate-50";
+    tagTextColor = "text-slate-600";
   }
 
   return (
-    <Link href={`/exam/${exam.id}`} className="block group min-w-[280px] w-[300px] sm:w-[320px] bg-white rounded-[2rem] border border-gray-100/80 p-2 shadow-sm hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full snap-start overflow-hidden">
+    <Link href={`/exam/${exam.id}`} className="block group min-w-[280px] w-[300px] sm:w-[320px] bg-white/90 backdrop-blur-sm rounded-[2rem] border border-slate-200/60 p-2 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(37,99,235,0.15)] hover:border-primary/40 hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full snap-start overflow-hidden">
 
       {/* Cover Image Area */}
       <div className={`relative h-48 w-full rounded-[1.5rem] overflow-hidden mb-5 p-4 ${coverGradient}`}>
@@ -110,17 +110,17 @@ export function ExamCard({ exam }: ExamCardProps) {
       <div className="px-4 pb-4 flex flex-col flex-1">
         {/* Title */}
         <div className="flex-1">
-          <h3 className="text-xl font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors">
+          <h3 className="text-xl font-bold font-heading text-slate-900 leading-snug line-clamp-2 group-hover:text-primary transition-colors">
             {exam.title}
           </h3>
-          <p className="text-sm text-gray-500 mt-2 font-medium flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-300"></span>
+          <p className="text-sm text-slate-500 mt-2 font-medium font-body flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary/40"></span>
             {exam.school}
           </p>
         </div>
 
         {/* Footer: Stats */}
-        <div className="flex items-center justify-between mt-8 gap-2">
+        <div className="flex items-center justify-between mt-8 gap-2 font-body">
           <button
             onClick={handleUpvote}
             disabled={isUpvoting}
@@ -141,14 +141,14 @@ export function ExamCard({ exam }: ExamCardProps) {
             </div>
           </button>
 
-          <div className="flex items-center gap-2 bg-indigo-50/50 px-2 py-2 rounded-[1.25rem] border border-indigo-100/50 group-hover:bg-indigo-50 transition-colors flex-1 overflow-hidden">
-            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm shrink-0">
+          <div className="flex items-center gap-2 bg-primary/5 px-2 py-2 rounded-[1.25rem] border border-primary/10 group-hover:bg-primary/10 transition-colors flex-1 overflow-hidden">
+            <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-primary shadow-sm shrink-0">
               <Download className="w-4 h-4" />
             </div>
-            <div className="min-w-0">
-              <div className="text-[9px] font-bold text-indigo-600/70 uppercase tracking-wider whitespace-nowrap truncate">Tải về</div>
-              <div className="text-sm font-extrabold text-indigo-900 flex items-center gap-1">
-                {formatNumber(exam.downloads)} <span className="text-indigo-500 text-[10px]">↓</span>
+            <div className="min-w-0 text-left">
+              <div className="text-[9px] font-bold text-primary/70 uppercase tracking-wider whitespace-nowrap truncate">Tải về</div>
+              <div className="text-sm font-extrabold text-slate-800 flex items-center gap-1">
+                {formatNumber(exam.downloads)} <span className="text-primary text-[10px]">↓</span>
               </div>
             </div>
           </div>

@@ -97,7 +97,7 @@ export function TopicThread({
               <button
                 onClick={handleLoadMore}
                 disabled={isLoadingMore}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm border border-slate-100 disabled:opacity-50"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-primary/5 hover:text-primary transition-all shadow-sm border border-slate-200/80 disabled:opacity-50"
                 title="Tải thêm bình luận"
               >
                 {isLoadingMore ? (
@@ -112,20 +112,20 @@ export function TopicThread({
       )}
 
       {showComments && onCreateComment && (
-        <div className="mt-4 pl-0 sm:pl-16 flex justify-end animate-in slide-in-from-top-4 fade-in duration-300">
+        <div className="mt-4 pl-0 sm:pl-16 flex justify-end animate-in slide-in-from-top-4 fade-in duration-300 font-body">
           <form onSubmit={handleSubmit} className="flex gap-3 w-full sm:w-11/12">
             <input 
               type="text" 
               value={replyContent}
               onChange={e => setReplyContent(e.target.value)}
               placeholder="Viết bình luận..." 
-              className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 transition-all shadow-sm"
+              className="flex-1 bg-white border border-slate-200/80 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-sm"
               disabled={isSubmitting}
             />
             <button 
               type="submit" 
               disabled={isSubmitting || !replyContent.trim()}
-              className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-sm"
+              className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary-hover disabled:opacity-50 transition-all shadow-[0_4px_10px_rgba(37,99,235,0.3)] disabled:shadow-none hover:-translate-y-0.5 disabled:hover:translate-y-0 active:scale-95 disabled:active:scale-100"
             >
               Gửi
             </button>

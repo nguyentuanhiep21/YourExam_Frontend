@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const beVietnamPro = Be_Vietnam_Pro({
-  weight: ["300", "400", "500", "600", "700", "800"],
-  style: ["normal", "italic"],
-  variable: "--font-be-vietnam-pro",
+const inter = Inter({
   subsets: ["latin", "vietnamese"],
+  variable: "--font-inter",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-plus-jakarta-sans",
 });
 
 export const metadata: Metadata = {
@@ -22,9 +25,9 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${beVietnamPro.variable} h-full antialiased font-sans`}
+      className={`${inter.variable} ${plusJakartaSans.variable} h-full antialiased font-sans`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-700">
         {children}
       </body>
     </html>

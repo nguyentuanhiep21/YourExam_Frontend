@@ -9,16 +9,16 @@ export default async function Navbar() {
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-transparent">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div className="flex h-16 items-center justify-between bg-white/40 backdrop-blur-md border border-white/40 shadow-sm rounded-full px-6">
+    <nav className="sticky top-0 z-50 w-full bg-transparent pt-4 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex h-16 items-center justify-between bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_30px_rgba(0,0,0,0.03)] rounded-full px-6 transition-all duration-300">
           
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group min-w-[150px]">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-lg">Y</span>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent/80 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
+              <span className="text-white font-bold text-lg font-heading">Y</span>
             </div>
-            <span className="text-xl font-bold tracking-tight text-gray-900">YourExam</span>
+            <span className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-primary transition-colors font-heading">YourExam</span>
           </Link>
 
           {/* Desktop Navigation (Centered) */}
@@ -28,9 +28,9 @@ export default async function Navbar() {
           <div className="flex items-center justify-end gap-4 min-w-[150px]">
             {user ? (
               <div className="flex items-center gap-4">
-                <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
+                <button className="relative p-2 text-slate-500 hover:text-primary hover:bg-primary-light/50 rounded-full transition-colors">
                   <Bell className="w-5 h-5" />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full border-2 border-white"></span>
                 </button>
                 <UserDropdown email={user.email || ""} />
               </div>
@@ -38,13 +38,13 @@ export default async function Navbar() {
               <div className="flex items-center gap-3">
                 <Link 
                   href="/login" 
-                  className="hidden md:block text-sm font-semibold text-gray-700 hover:text-violet-600 transition-colors"
+                  className="hidden md:block text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
                 >
                   Đăng nhập
                 </Link>
                 <Link 
                   href="/register" 
-                  className="px-5 py-2.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-700 rounded-full shadow-sm transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-hover rounded-full shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-95"
                 >
                   Đăng ký miễn phí
                 </Link>
