@@ -19,7 +19,7 @@ export function HeroSection() {
           NỀN TẢNG ÔN THI VÀ <br className="hidden md:block" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
             CHIA SẺ TÀI LIỆU
-          </span> TOÀN DIỆN
+          </span> <br /> TOÀN DIỆN
         </h1>
 
         <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 font-body">
@@ -28,7 +28,7 @@ export function HeroSection() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-7 duration-700 delay-300">
           <Link
-            href="/create-exam"
+            href="/exams"
             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl text-base font-bold transition-all shadow-[0_8px_20px_-4px_rgba(37,99,235,0.4)] hover:-translate-y-0.5 active:scale-95 group"
           >
             Tạo đề thi ngay

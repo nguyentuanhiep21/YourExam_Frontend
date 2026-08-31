@@ -16,7 +16,7 @@ export function FeaturesBento() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {/* Main Feature - Smart Exam Generation (Spans 2 columns on tablet/desktop) */}
-          <Link href="/create-exam" className="group relative overflow-hidden rounded-[2rem] bg-white p-8 md:col-span-2 flex flex-col justify-between min-h-[320px] transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(37,99,235,0.15)] border border-slate-200/60">
+          <Link href="/exams" className="group relative overflow-hidden rounded-[2rem] bg-white p-8 md:col-span-2 flex flex-col justify-between min-h-[320px] transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(37,99,235,0.15)] border border-slate-200/60">
             <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
             
             <div className="relative z-10">
@@ -52,7 +52,7 @@ export function FeaturesBento() {
           </Link>
 
           {/* Online Practice */}
-          <Link href="/practice" className="group relative overflow-hidden rounded-[2rem] bg-white p-8 flex flex-col justify-between min-h-[280px] transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl border border-slate-200/60">
+          <Link href="/exams" className="group relative overflow-hidden rounded-[2rem] bg-white p-8 flex flex-col justify-between min-h-[280px] transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl border border-slate-200/60">
              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
             <div className="relative z-10">
               <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">

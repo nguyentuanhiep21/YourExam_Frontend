@@ -23,7 +23,7 @@ export function BottomCTA() {
           
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 w-full sm:w-auto">
             <Link 
-              href="/create-exam" 
+              href="/exams" 
               className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-2xl text-base font-bold transition-all shadow-[0_8px_20px_-4px_rgba(37,99,235,0.4)] active:scale-95 group"
             >
               Bắt đầu miễn phí

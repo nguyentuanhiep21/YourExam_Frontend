@@ -134,7 +134,7 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
         }))
       };
 
-      const { createExamApi } = await import("../../home/api/createExam.api");
+      const { createExamApi } = await import("../api/createExam.api");
       const blob = await createExamApi.exportToDocx(payload);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");

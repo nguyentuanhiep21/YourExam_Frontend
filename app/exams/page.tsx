@@ -1,6 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import { DocumentSearchHeader } from "@/features/documents/components/DocumentSearchHeader";
-import { ExamCarousel } from "@/features/home/components/ExamCarousel";
+import { ExamCarousel } from "@/features/exam/components/ExamCarousel";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function DocumentsPage() {

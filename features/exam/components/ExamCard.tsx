@@ -1,10 +1,10 @@
 "use client";
 
 import { Download, ThumbsUp, FileText } from "lucide-react";
-import { ExamMockData } from "../types/home.types";
+import { ExamMockData } from "../types/exam.types";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { upvoteGeneratedExam } from "../../exam/api/exam.actions";
+import { upvoteGeneratedExam } from "../api/exam.actions";
 // Helper function to format numbers (e.g. 12000 -> 12K)
 function formatNumber(num: number): string {
   if (num >= 1000) {
