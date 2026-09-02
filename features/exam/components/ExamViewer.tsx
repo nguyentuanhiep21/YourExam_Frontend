@@ -10,6 +10,7 @@ import { Clock, BookOpen, BarChart, ThumbsUp, Download, Award, ArrowLeft, Pencil
 import Link from "next/link";
 import { updateGeneratedExam, upvoteGeneratedExam } from "../api/exam.actions";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/alerts/toast-context";
 
 interface ExamViewerProps {
   exam: GeneratedExam;
@@ -20,6 +21,7 @@ type ViewMode = 'view' | 'take' | 'result' | 'review';
 
 export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
   const router = useRouter();
+  const toast = useToast();
   const isAuthor = currentUserId === exam.AuthorId;
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -81,8 +83,9 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
       
       setIsEditing(false);
       setEditedQuestions({});
+      toast.success("Đã lưu thay đổi đề thi", "Thành công");
     } catch (error: any) {
-      alert(error.message || "Đã xảy ra lỗi khi lưu đề thi.");
+      toast.error(error.message || "Đã xảy ra lỗi khi lưu đề thi.", "Lỗi lưu đề thi");
     } finally {
       setIsSaving(false);
     }
@@ -110,7 +113,7 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
       console.error("Lỗi khi upvote:", error);
       setHasUpvoted(!willUpvote);
       setOptimisticUpvoteCount(prev => prev + (willUpvote ? -1 : 1));
-      alert("Đã xảy ra lỗi khi cập nhật upvote.");
+      toast.error("Đã xảy ra lỗi khi cập nhật upvote.", "Lỗi upvote");
     } finally {
       setIsUpvoting(false);
     }
@@ -154,7 +157,9 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
     } catch (error: any) {
       console.error("Lỗi khi tải xuống:", error);
       if (error.message?.includes("đăng nhập")) {
-        alert("Vui lòng đăng nhập để tải đề thi.");
+        toast.warning("Vui lòng đăng nhập để tải đề thi.", "Yêu cầu đăng nhập");
+      } else {
+        toast.error("Đã xảy ra lỗi khi tải đề thi.", "Lỗi tải xuống");
       }
     } finally {
       setIsDownloading(false);

@@ -62,6 +62,8 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
                 structureType={state.structureType}
                 savedBlueprints={state.savedBlueprints}
                 isLoadingBlueprints={state.isLoadingBlueprints}
+                systemBlueprints={state.systemBlueprints}
+                isLoadingSystemBlueprints={state.isLoadingSystemBlueprints}
                 deletingId={state.deletingId}
                 customRules={state.customRules}
                 isAddingQuestion={state.isAddingQuestion}
@@ -74,6 +76,7 @@ export function CreateExamModal({ onClose }: CreateExamModalProps) {
                 onSetEditingBlueprintId={actions.setEditingBlueprintId}
                 onDeleteBlueprint={actions.handleDeleteBlueprint}
                 onEditBlueprint={actions.handleEditBlueprint}
+                onSelectSystemBlueprint={actions.handleSelectSystemBlueprint}
                 onUpdateQuantity={actions.updateQuantity}
                 onRemoveRule={actions.removeRule}
                 onSetIsAddingQuestion={actions.setIsAddingQuestion}

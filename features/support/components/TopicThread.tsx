@@ -5,6 +5,7 @@ import { TopicCard } from "./TopicCard";
 import { CommentCard } from "./CommentCard";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/alerts/toast-context";
 
 interface TopicThreadProps {
   topic: Topic;
@@ -27,6 +28,7 @@ export function TopicThread({
   onDeleteComment,
   onLoadMoreComments
 }: TopicThreadProps) {
+  const toast = useToast();
   const [showComments, setShowComments] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,9 +42,9 @@ export function TopicThread({
       setIsSubmitting(true);
       await onCreateComment(topic.Id, replyContent);
       setReplyContent("");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Đã xảy ra lỗi khi tạo bình luận.");
+      toast.error(err.message || "Đã xảy ra lỗi khi tạo bình luận.", "Lỗi bình luận");
     } finally {
       setIsSubmitting(false);
     }

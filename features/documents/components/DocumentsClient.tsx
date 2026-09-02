@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Upload, Search, FileText, Loader2, AlertCircle, LayoutGrid, List } from 'lucide-react';
+import { useToast } from "@/components/ui/alerts/toast-context";
 import { useDocuments } from '@/features/documents/hooks/useDocuments';
 import { useUploadDocument } from '@/features/documents/hooks/useUploadDocument';
 import { DocumentCard } from '@/features/documents/components/DocumentCard';
@@ -13,6 +14,7 @@ import { UserDocument } from '@/features/documents/types/document.types';
 export default function DocumentsClient() {
   const { documents, isLoading, error, refresh } = useDocuments();
   const { uploadDocument, isUploading, error: uploadError } = useUploadDocument();
+  const toast = useToast();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDoc, setSelectedDoc] = useState<UserDocument | null>(null);
@@ -54,13 +56,17 @@ export default function DocumentsClient() {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      alert("File quá lớn. Vui lòng chọn file dưới 10MB.");
+      toast.error("File quá lớn. Vui lòng chọn file dưới 10MB.", "Lỗi tải lên");
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
     const result = await uploadDocument(file);
     if (result) {
+      toast.success("Tài liệu đã được tải lên thành công.", "Thành công");
       refresh();
+    } else {
+      toast.error("Đã xảy ra lỗi khi tải lên tài liệu.", "Lỗi tải lên");
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';

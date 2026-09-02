@@ -4,8 +4,10 @@ import { CustomRule } from "../types/createExam.types";
 import { EXERCISE_TYPES, SUBJECT_CODE_MAP, getExerciseTypes, QuestionFormat, QuestionDifficulty } from "../constants/createExam.constants";
 import { createExamApi } from "../api/createExam.api";
 import { getGmt7IsoString } from "@/utils/time";
+import { useToast } from "@/components/ui/alerts/toast-context";
 
 export const useCreateExamModal = () => {
+  const toast = useToast();
   const [step, setStep] = useState(1);
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -35,9 +37,15 @@ export const useCreateExamModal = () => {
   const [isSavingBlueprint, setIsSavingBlueprint] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
 
+  // System templates
+  const [systemBlueprints, setSystemBlueprints] = useState<any[]>([]);
+  const [isLoadingSystemBlueprints, setIsLoadingSystemBlueprints] = useState(false);
+
   useEffect(() => {
     if (structureType === "saved") {
       fetchBlueprints();
+    } else if (structureType === "template") {
+      fetchSystemBlueprints();
     }
   }, [structureType]);
 
@@ -54,6 +62,18 @@ export const useCreateExamModal = () => {
       console.error("Lỗi khi tải cấu trúc đề:", error);
     } finally {
       setIsLoadingBlueprints(false);
+    }
+  };
+
+  const fetchSystemBlueprints = async () => {
+    setIsLoadingSystemBlueprints(true);
+    try {
+      const { data } = await createExamApi.fetchSystemBlueprints();
+      if (data) setSystemBlueprints(data);
+    } catch (error) {
+      console.error("Lỗi khi tải cấu trúc gợi ý:", error);
+    } finally {
+      setIsLoadingSystemBlueprints(false);
     }
   };
 
@@ -94,8 +114,8 @@ export const useCreateExamModal = () => {
       setBlueprintName("");
       setEditingBlueprintId(null);
       setStructureType("saved");
-    } catch (error: any) {
-      alert("Lỗi khi lưu cấu trúc: " + error.message);
+    } catch (err: any) {
+      toast.error(err.message, "Lỗi khi lưu cấu trúc");
     } finally {
       setIsSavingBlueprint(false);
     }
@@ -106,8 +126,8 @@ export const useCreateExamModal = () => {
       const { error } = await createExamApi.deleteBlueprint(id);
       if (error) throw error;
       setSavedBlueprints(prev => prev.filter(bp => bp.Id !== id));
-    } catch (error: any) {
-      alert("Lỗi khi xóa cấu trúc đề: " + error.message);
+    } catch (err: any) {
+      toast.error(err.message, "Lỗi khi xóa cấu trúc đề");
     }
   };
 
@@ -120,6 +140,25 @@ export const useCreateExamModal = () => {
       const format = rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem";
       return {
         id: rule.Id.toString(),
+        diffId,
+        diffName,
+        format,
+        quantity: rule.Quantity
+      };
+    });
+    setCustomRules(mappedRules);
+    setStructureType("custom");
+  };
+
+  const handleSelectSystemBlueprint = (bp: any) => {
+    setEditingBlueprintId(null);
+    setBlueprintName(`Bản sao của ${bp.Name}`);
+    const mappedRules = (bp.BlueprintRules || []).map((rule: any) => {
+      const diffName = rule.Difficulty === QuestionDifficulty.Easy ? "Dễ" : rule.Difficulty === QuestionDifficulty.Medium ? "Trung bình" : "Khó";
+      const diffId = rule.Difficulty === QuestionDifficulty.Easy ? "easy" : rule.Difficulty === QuestionDifficulty.Medium ? "medium" : "hard";
+      const format = rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem";
+      return {
+        id: Date.now().toString() + Math.random().toString().slice(2, 6),
         diffId,
         diffName,
         format,
@@ -235,21 +274,21 @@ export const useCreateExamModal = () => {
       });
 
       if (hasError) {
-        alert(errorMsg);
+        toast.error(errorMsg, "Lỗi tạo câu hỏi");
         setIsGeneratingExamAPI(false);
         return;
       }
 
       if (allQuestions.length === 0) {
-        alert("Không thể tạo được đề thi (không tìm thấy câu hỏi phù hợp).");
+        toast.error("Không tìm thấy câu hỏi phù hợp", "Lỗi tạo đề thi");
         setIsGeneratingExamAPI(false);
         return;
       }
 
       setGeneratedQuestions(allQuestions);
       setIsGeneratingWizard(false);
-    } catch (error) {
-      alert("Có lỗi xảy ra khi tạo đề thi: " + error);
+    } catch (err: any) {
+      toast.error(err.message || String(err), "Có lỗi xảy ra khi tạo đề thi");
     } finally {
       setIsGeneratingExamAPI(false);
     }
@@ -262,7 +301,7 @@ export const useCreateExamModal = () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert("Vui lòng đăng nhập để lưu đề thi.");
+        toast.warning("Vui lòng đăng nhập để lưu đề thi.");
         return;
       }
 
@@ -285,10 +324,10 @@ export const useCreateExamModal = () => {
       };
 
       await createExamApi.saveGeneratedExam(payload, user.id);
-      alert("Lưu đề thi vào hệ thống thành công!");
+      toast.success("Lưu đề thi vào hệ thống thành công!");
       setShowSaveExamDialog(false);
-    } catch (error: any) {
-      alert("Lỗi khi lưu đề thi: " + error.message);
+    } catch (err: any) {
+      toast.error(err.message, "Lỗi khi lưu đề thi");
     } finally {
       setIsSavingExam(false);
     }
@@ -323,8 +362,8 @@ export const useCreateExamModal = () => {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      alert("Lỗi khi tải file DOCX: " + error);
+    } catch (err: any) {
+      toast.error(err.message || String(err), "Lỗi khi tải file DOCX");
     } finally {
       setIsExporting(false);
     }
@@ -332,10 +371,10 @@ export const useCreateExamModal = () => {
 
   return {
     state: {
-      step, selectedGrade, selectedSubject, structureType, deletingId, customRules, isAddingQuestion, isGeneratingQuestion, questionFormat, newExerciseType, isGeneratingWizard, currentRuleIndex, distributionState, generatedQuestions, isGeneratingExamAPI, isSavingExam, showSaveExamDialog, savedBlueprints, isLoadingBlueprints, blueprintName, editingBlueprintId, isSavingBlueprint, showSaveDialog, canProceed, hasSelectedBoth, isExporting
+      step, selectedGrade, selectedSubject, structureType, deletingId, customRules, isAddingQuestion, isGeneratingQuestion, questionFormat, newExerciseType, isGeneratingWizard, currentRuleIndex, distributionState, generatedQuestions, isGeneratingExamAPI, isSavingExam, showSaveExamDialog, savedBlueprints, isLoadingBlueprints, blueprintName, editingBlueprintId, isSavingBlueprint, showSaveDialog, canProceed, hasSelectedBoth, isExporting, systemBlueprints, isLoadingSystemBlueprints
     },
     actions: {
-      setStep, setSelectedGrade, setSelectedSubject, setStructureType, setDeletingId, setCustomRules, setIsAddingQuestion, setIsGeneratingQuestion, setQuestionFormat, setNewExerciseType, setIsGeneratingWizard, setCurrentRuleIndex, setDistributionState, setGeneratedQuestions, setIsGeneratingExamAPI, setSavedBlueprints, setIsLoadingBlueprints, setBlueprintName, setEditingBlueprintId, setIsSavingBlueprint, setShowSaveDialog, setShowSaveExamDialog, fetchBlueprints, saveCustomBlueprint, handleDeleteBlueprint, handleEditBlueprint, handleAddCustomRule, updateQuantity, removeRule, updateDistribution, executeGenerateExam, handleSaveExamToSupabase, handleDownloadDocx
+      setStep, setSelectedGrade, setSelectedSubject, setStructureType, setDeletingId, setCustomRules, setIsAddingQuestion, setIsGeneratingQuestion, setQuestionFormat, setNewExerciseType, setIsGeneratingWizard, setCurrentRuleIndex, setDistributionState, setGeneratedQuestions, setIsGeneratingExamAPI, setSavedBlueprints, setIsLoadingBlueprints, setBlueprintName, setEditingBlueprintId, setIsSavingBlueprint, setShowSaveDialog, setShowSaveExamDialog, fetchBlueprints, saveCustomBlueprint, handleDeleteBlueprint, handleEditBlueprint, handleSelectSystemBlueprint, handleAddCustomRule, updateQuantity, removeRule, updateDistribution, executeGenerateExam, handleSaveExamToSupabase, handleDownloadDocx
     }
   };
 };

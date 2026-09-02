@@ -7,8 +7,10 @@ import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
 import { Pagination } from "./Pagination";
 import { HelpCircle, Loader2, ChevronDown, Check } from "lucide-react";
 import { useSupport } from "../hooks/useSupport";
+import { useToast } from "@/components/ui/alerts/toast-context";
 
 export function SupportClient() {
+  const toast = useToast();
   const { 
     topics, loading, error, currentUser, savedTopicIds,
     totalTopics, page, limit,
@@ -32,7 +34,7 @@ export function SupportClient() {
       setIsSubmitting(true);
       await addTopic(title, content, imageFile);
     } catch (err: any) {
-      alert(err.message || "Đã xảy ra lỗi khi tạo chủ đề.");
+      toast.error(err.message || "Đã xảy ra lỗi khi tạo chủ đề.", "Lỗi tạo chủ đề");
     } finally {
       setIsSubmitting(false);
     }
@@ -42,15 +44,15 @@ export function SupportClient() {
     try {
       await addComment(topicId, content);
     } catch (err: any) {
-      alert(err.message || "Đã xảy ra lỗi khi tạo bình luận.");
+      toast.error(err.message || "Đã xảy ra lỗi khi tạo bình luận.", "Lỗi bình luận");
     }
   };
 
   const handleToggleSave = async (topicId: number) => {
     try {
       await toggleSaveTopic(topicId);
-    } catch (err) {
-      alert("Đã xảy ra lỗi khi lưu/bỏ lưu chủ đề.");
+    } catch (err: any) {
+      toast.error("Đã xảy ra lỗi khi lưu/bỏ lưu chủ đề.", "Lỗi lưu chủ đề");
     }
   };
 
@@ -71,9 +73,10 @@ export function SupportClient() {
       } else if (itemToDelete.type === 'comment' && itemToDelete.commentId) {
         await removeComment(itemToDelete.topicId, itemToDelete.commentId);
       }
+      toast.success(itemToDelete.type === 'comment' ? "Bình luận đã được xóa." : "Chủ đề đã được xóa.", "Thành công");
       setItemToDelete(null);
     } catch (err: any) {
-      alert(err.message || "Đã xảy ra lỗi khi xóa.");
+      toast.error(err.message || "Đã xảy ra lỗi khi xóa.", "Lỗi xóa");
     } finally {
       setIsDeleting(false);
     }

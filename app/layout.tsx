@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "Nền tảng tạo đề thi và chia sẻ tài liệu dành cho giáo viên và học sinh Việt Nam",
 };
 
+import { ToastProvider } from "@/components/ui/alerts/toast-context";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,7 +30,9 @@ export default function RootLayout({
       className={`${inter.variable} ${plusJakartaSans.variable} h-full antialiased font-sans`}
     >
       <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-700">
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );
