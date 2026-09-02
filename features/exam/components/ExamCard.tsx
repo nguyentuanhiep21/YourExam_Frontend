@@ -4,7 +4,11 @@ import { Download, ThumbsUp, FileText } from "lucide-react";
 import { ExamMockData } from "../types/exam.types";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { upvoteGeneratedExam } from "../api/exam.actions";
+import { upvoteGeneratedExam, fetchExamForDownload, incrementDownloadCount } from "../api/exam.actions";
+import { createExamApi } from "../api/createExam.api";
+import { useToast } from "@/components/ui/alerts/toast-context";
+import { Loader2 } from "lucide-react";
+
 // Helper function to format numbers (e.g. 12000 -> 12K)
 function formatNumber(num: number): string {
   if (num >= 1000) {
@@ -18,9 +22,12 @@ interface ExamCardProps {
 }
 
 export function ExamCard({ exam }: ExamCardProps) {
+  const toast = useToast();
   const [isUpvoting, setIsUpvoting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [hasUpvoted, setHasUpvoted] = useState(false);
   const [optimisticUpvoteCount, setOptimisticUpvoteCount] = useState(exam.upvotes);
+  const [optimisticDownloadCount, setOptimisticDownloadCount] = useState(exam.downloads);
 
   useEffect(() => {
     // Check if user has upvoted this exam in current browser session
@@ -65,6 +72,64 @@ export function ExamCard({ exam }: ExamCardProps) {
       }
     } finally {
       setIsUpvoting(false);
+    }
+  };
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isDownloading) return;
+
+    try {
+      setIsDownloading(true);
+      const numericId = parseInt(exam.id, 10);
+      if (isNaN(numericId)) throw new Error("ID không hợp lệ");
+
+      const fullExam = await fetchExamForDownload(numericId);
+      
+      let defaultFileName = "DeThi";
+      if (fullExam.Subject && fullExam.GradeLevel) {
+        const subject = fullExam.Subject.replace(/\s+/g, '');
+        const grade = fullExam.GradeLevel;
+        defaultFileName = `DeThi${subject}Lop${grade}`;
+      }
+
+      const payload = {
+        fileName: defaultFileName,
+        exercises: fullExam.Questions?.map((q: any) => ({
+          content: q.QuestionContent,
+          choices: q.QuestionFormat === 0 ? q.MultipleChoiceOptions || [] : [],
+          correctAnswer: q.CorrectAnswer,
+          exerciseType: 0
+        })) || []
+      };
+
+      const blob = await createExamApi.exportToDocx(payload);
+      
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${defaultFileName}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      
+      const result = await incrementDownloadCount(numericId);
+      if (result.success && result.newCount) {
+        setOptimisticDownloadCount(result.newCount);
+      }
+      
+      toast.success("Tải đề thi thành công!", "Thành công");
+    } catch (error: any) {
+      console.error("Lỗi khi tải xuống:", error);
+      if (error.message?.includes("đăng nhập") || error.message?.includes("quyền")) {
+        toast.warning("Vui lòng đăng nhập để tải đề thi.", "Yêu cầu đăng nhập");
+      } else {
+        toast.error("Đã xảy ra lỗi khi tải đề thi.", "Lỗi tải xuống");
+      }
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -141,17 +206,25 @@ export function ExamCard({ exam }: ExamCardProps) {
             </div>
           </button>
 
-          <div className="flex items-center gap-2 bg-primary/5 px-2 py-2 rounded-[1.25rem] border border-primary/10 group-hover:bg-primary/10 transition-colors flex-1 overflow-hidden">
+          <button 
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="flex items-center gap-2 bg-primary/5 px-2 py-2 rounded-[1.25rem] border border-primary/10 hover:bg-primary/10 transition-colors flex-1 overflow-hidden disabled:opacity-50 cursor-pointer z-10"
+          >
             <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-primary shadow-sm shrink-0">
-              <Download className="w-4 h-4" />
+              {isDownloading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
             </div>
             <div className="min-w-0 text-left">
               <div className="text-[9px] font-bold text-primary/70 uppercase tracking-wider whitespace-nowrap truncate">Tải về</div>
               <div className="text-sm font-extrabold text-slate-800 flex items-center gap-1">
-                {formatNumber(exam.downloads)} <span className="text-primary text-[10px]">↓</span>
+                {formatNumber(optimisticDownloadCount)} <span className="text-primary text-[10px]">↓</span>
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </Link>

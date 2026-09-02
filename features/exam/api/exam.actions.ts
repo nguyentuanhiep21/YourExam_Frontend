@@ -228,3 +228,24 @@ export async function incrementDownloadCount(id: number) {
   return { success: true, newCount };
 }
 
+/**
+ * Server Action to fetch an exam for downloading.
+ */
+export async function fetchExamForDownload(id: number) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("GeneratedExams")
+    .select(`
+      *,
+      Questions:GeneratedExamQuestions(*)
+    `)
+    .eq("Id", id)
+    .single();
+
+  if (error || !data) {
+    throw new Error("Không tìm thấy đề thi hoặc không có quyền truy cập.");
+  }
+
+  return data;
+}
