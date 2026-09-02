@@ -11,6 +11,14 @@ export const createExamApi = {
       .order("Id", { ascending: false });
   },
 
+  async fetchSystemBlueprints() {
+    const supabase = createClient();
+    return supabase
+      .from("ExamBlueprints")
+      .select("*, BlueprintRules(*)")
+      .eq("IsSystemProvided", true);
+  },
+
   async deleteBlueprint(id: number) {
     const supabase = createClient();
     return supabase.from("ExamBlueprints").delete().eq("Id", id);

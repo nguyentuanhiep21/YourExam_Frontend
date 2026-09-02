@@ -23,13 +23,16 @@ interface Props {
   onRemoveRule: (id: string) => void;
   onSetIsAddingQuestion: (val: boolean) => void;
   onSetShowSaveDialog: (val: boolean) => void;
+  systemBlueprints?: any[];
+  isLoadingSystemBlueprints?: boolean;
+  onSelectSystemBlueprint?: (bp: any) => void;
 }
 
 export const StructureStep = ({
-  selectedGrade, selectedSubject, structureType, savedBlueprints, isLoadingBlueprints, deletingId, customRules,
+  selectedGrade, selectedSubject, structureType, savedBlueprints, isLoadingBlueprints, systemBlueprints = [], isLoadingSystemBlueprints = false, deletingId, customRules,
   isAddingQuestion, isGeneratingQuestion,
   onSetStep, onSetStructureType, onSetDeletingId, onSetCustomRules, onSetBlueprintName, onSetEditingBlueprintId,
-  onDeleteBlueprint, onEditBlueprint, onUpdateQuantity, onRemoveRule, onSetIsAddingQuestion, onSetShowSaveDialog
+  onDeleteBlueprint, onEditBlueprint, onSelectSystemBlueprint, onUpdateQuantity, onRemoveRule, onSetIsAddingQuestion, onSetShowSaveDialog
 }: Props) => {
   return (
     <div className="space-y-8">
@@ -98,17 +101,53 @@ export const StructureStep = ({
             </button>
             <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider ml-2">Chọn mức độ (Gợi ý)</h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {["Dễ", "Trung bình", "Khó"].map((level) => (
-              <button
-                key={level}
-                disabled
-                className="py-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-400 font-semibold cursor-not-allowed"
-              >
-                {level} (Sắp ra mắt)
-              </button>
-            ))}
-          </div>
+          
+          {isLoadingSystemBlueprints ? (
+            <div className="p-8 rounded-2xl border border-gray-200 bg-gray-50 flex justify-center items-center">
+              <Loader2 className="animate-spin text-violet-500 w-6 h-6" />
+            </div>
+          ) : systemBlueprints.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { name: "easy", label: "Dễ", icon: "🌱", color: "emerald" },
+                { name: "medium", label: "Trung bình", icon: "⭐", color: "amber" },
+                { name: "hard", label: "Khó", icon: "🔥", color: "rose" }
+              ].map((level) => {
+                const bp = systemBlueprints.find(b => b.Name?.toLowerCase() === level.name.toLowerCase());
+                const isAvailable = !!bp;
+                
+                return (
+                  <button
+                    key={level.name}
+                    disabled={!isAvailable}
+                    onClick={() => isAvailable && onSelectSystemBlueprint && onSelectSystemBlueprint(bp)}
+                    className={`relative p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center justify-center gap-3 ${
+                      isAvailable
+                        ? `bg-white border-gray-200 hover:border-${level.color}-400 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-1 active:scale-95 group cursor-pointer`
+                        : "bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed"
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+                      isAvailable ? `bg-${level.color}-50 group-hover:bg-${level.color}-100 transition-colors` : "bg-gray-100 grayscale"
+                    }`}>
+                      {level.icon}
+                    </div>
+                    <div className="text-center">
+                      <span className={`font-bold block text-lg ${isAvailable ? "text-gray-900" : "text-gray-400"}`}>
+                        {level.label}
+                      </span>
+                      {!isAvailable && <span className="text-xs text-gray-400 font-medium">(Sắp ra mắt)</span>}
+                      {isAvailable && <span className={`text-xs text-${level.color}-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity`}>Chọn mẫu này</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="p-8 rounded-2xl border border-gray-200 bg-gray-50 text-center flex flex-col justify-center items-center">
+              <span className="text-sm text-gray-500">Chưa có cấu trúc gợi ý nào được cập nhật.</span>
+            </div>
+          )}
         </div>
       )}
 
