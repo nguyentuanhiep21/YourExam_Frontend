@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface UserDropdownProps {
   email: string;
@@ -40,6 +41,15 @@ export function UserDropdown({ email }: UserDropdownProps) {
               <div className="px-3 py-2 text-xs text-gray-500 font-medium truncate border-b border-gray-100 mb-1">
                 {email}
               </div>
+              
+              <Link
+                href="/profile"
+                onClick={() => setIsOpen(false)}
+                className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-3 hover:bg-primary-light/50 hover:text-primary text-gray-700"
+              >
+                <User className="w-4 h-4" />
+                Thông tin tài khoản
+              </Link>
               
               <button
                 onClick={handleLogout}
