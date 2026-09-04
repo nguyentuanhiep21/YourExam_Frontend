@@ -40,6 +40,8 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
   const [isPublic, setIsPublic] = useState(exam.IsPublic);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
+  const authorName = (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as any)?.FullName) || "Khuyết danh";
+  
   // Local state for questions
   const [editedQuestions, setEditedQuestions] = useState<Record<number, Partial<GeneratedExamQuestion>>>({});
 
@@ -353,9 +355,14 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
                 placeholder="Nhập tiêu đề đề thi..."
               />
             ) : (
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-8">
-                {title}
-              </h1>
+              <div className="mb-8">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3">
+                  {title}
+                </h1>
+                <p className="text-sm text-slate-500 font-medium">
+                  đăng bởi <span className="text-indigo-600 font-semibold">{authorName}</span>
+                </p>
+              </div>
             )}
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">

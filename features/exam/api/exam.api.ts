@@ -12,7 +12,8 @@ export async function getGeneratedExamById(id: number): Promise<GeneratedExam | 
     .from("GeneratedExams")
     .select(`
       *,
-      Questions:GeneratedExamQuestions(*)
+      Questions:GeneratedExamQuestions(*),
+      Author:Profiles!FK_GeneratedExams_Profiles_AuthorId(FullName)
     `)
     .eq("Id", id)
     .single();

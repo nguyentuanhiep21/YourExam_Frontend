@@ -40,6 +40,7 @@ export interface GeneratedExam {
   // Navigation property for frontend use
   Questions?: GeneratedExamQuestion[];
   hasUpvoted?: boolean;
+  Author?: { FullName: string } | { FullName: string }[];
 }
 
 export interface UpdateGeneratedExamPayload {
@@ -62,9 +63,9 @@ export interface ExamMockData {
   title: string;
   subject: string;
   grade: string;
-  school: string;
   downloads: number;
   upvotes: number;
   tags: string[];
   hasUpvoted?: boolean;
+  authorName?: string;
 }

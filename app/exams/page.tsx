@@ -14,7 +14,7 @@ export default async function DocumentsPage() {
   // Fetch Trending Exams (Top 10 out of 50 recent public exams by total engagement)
   const { data: recentExamsData } = await supabase
     .from("GeneratedExams")
-    .select("Id, Title, Subject, GradeLevel, DownloadCount, UpvoteCount")
+    .select("Id, Title, Subject, GradeLevel, DownloadCount, UpvoteCount, Author:Profiles!FK_GeneratedExams_Profiles_AuthorId(FullName, School)")
     .eq("IsPublic", true)
     .order("CreatedAt", { ascending: false })
     .limit(50);
@@ -48,18 +48,18 @@ export default async function DocumentsPage() {
       title: exam.Title || "Đề thi chưa đặt tên",
       subject: exam.Subject || "Chung",
       grade: `Lớp ${exam.GradeLevel}`,
-      school: "YourExam",
       downloads: exam.DownloadCount || 0,
       upvotes: exam.UpvoteCount || 0,
       tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
-      hasUpvoted: votedExamIds.has(exam.Id)
+      hasUpvoted: votedExamIds.has(exam.Id),
+      authorName: (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as any)?.FullName) || "Khuyết danh"
     }));
   }
 
   // Fetch New Public Exams
   const { data: publicExamsData } = await supabase
     .from("GeneratedExams")
-    .select("Id, Title, Subject, GradeLevel, DownloadCount, UpvoteCount")
+    .select("Id, Title, Subject, GradeLevel, DownloadCount, UpvoteCount, Author:Profiles!FK_GeneratedExams_Profiles_AuthorId(FullName, School)")
     .eq("IsPublic", true)
     .order("CreatedAt", { ascending: false })
     .limit(12);
@@ -85,18 +85,18 @@ export default async function DocumentsPage() {
       title: exam.Title || "Đề thi chưa đặt tên",
       subject: exam.Subject || "Chung",
       grade: `Lớp ${exam.GradeLevel}`,
-      school: "YourExam",
       downloads: exam.DownloadCount || 0,
       upvotes: exam.UpvoteCount || 0,
       tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
-      hasUpvoted: votedExamIds.has(exam.Id)
+      hasUpvoted: votedExamIds.has(exam.Id),
+      authorName: (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as any)?.FullName) || "Khuyết danh"
     }));
   }
 
   if (user) {
     const { data } = await supabase
       .from("GeneratedExams")
-      .select("Id, Title, Subject, GradeLevel, DownloadCount, UpvoteCount")
+      .select("Id, Title, Subject, GradeLevel, DownloadCount, UpvoteCount, Author:Profiles!FK_GeneratedExams_Profiles_AuthorId(FullName, School)")
       .eq("AuthorId", user.id)
       .order("CreatedAt", { ascending: false });
       
@@ -122,11 +122,11 @@ export default async function DocumentsPage() {
         title: exam.Title || "Đề thi chưa đặt tên",
         subject: exam.Subject || "Chung",
         grade: `Lớp ${exam.GradeLevel}`,
-        school: "YourExam",
         downloads: exam.DownloadCount || 0,
         upvotes: exam.UpvoteCount || 0,
         tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
-        hasUpvoted: votedExamIds.has(exam.Id)
+        hasUpvoted: votedExamIds.has(exam.Id),
+        authorName: (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as any)?.FullName) || "Bạn"
       }));
     }
   }

@@ -178,10 +178,11 @@ export function ExamCard({ exam }: ExamCardProps) {
           <h3 className="text-xl font-bold font-heading text-slate-900 leading-snug line-clamp-2 group-hover:text-primary transition-colors">
             {exam.title}
           </h3>
-          <p className="text-sm text-slate-500 mt-2 font-medium font-body flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary/40"></span>
-            {exam.school}
-          </p>
+          {exam.authorName && (
+            <p className="text-sm text-slate-600 mt-1 font-medium font-body">
+              bởi <span className="font-semibold text-primary/80">{exam.authorName}</span>
+            </p>
+          )}
         </div>
 
         {/* Footer: Stats */}
