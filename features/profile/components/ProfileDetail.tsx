@@ -8,13 +8,17 @@ import { AvatarUpdateDialog } from "./AvatarUpdateDialog";
 
 interface ProfileDetailProps {
   profile: Profile;
+  authEmail: string;
+  authPhone: string | null;
 }
 
-export function ProfileDetail({ profile: initialProfile }: ProfileDetailProps) {
+export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }: ProfileDetailProps) {
   const [profile, setProfile] = useState<Profile>(initialProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<Profile>(initialProfile);
+  const [authFormData, setAuthFormData] = useState({ email: authEmail, phone: authPhone || "" });
+  const [currentAuth, setCurrentAuth] = useState({ email: authEmail, phone: authPhone || "" });
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
 
   const handleAvatarUpdated = (url: string) => {
@@ -35,23 +39,53 @@ export function ProfileDetail({ profile: initialProfile }: ProfileDetailProps) {
     const supabase = createClient();
     
     try {
-      const { error } = await supabase
+      const { error: profileError } = await supabase
         .from("Profiles")
         .update({
           FullName: formData.FullName,
-          PhoneNumber: formData.PhoneNumber,
           School: formData.School,
           SubjectsTaught: formData.SubjectsTaught,
         })
         .eq("Id", profile.Id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Update Auth (Email and Phone)
+      const authUpdates: any = {};
+      if (authFormData.email !== currentAuth.email) authUpdates.email = authFormData.email;
+      
+      let rawPhone = authFormData.phone;
+      if (rawPhone !== currentAuth.phone) {
+        let formattedPhone = rawPhone.trim();
+        if (formattedPhone.startsWith('0')) {
+          formattedPhone = '+84' + formattedPhone.substring(1);
+        }
+        authUpdates.phone = formattedPhone;
+      }
+
+      if (Object.keys(authUpdates).length > 0) {
+        const { error: authError } = await supabase.auth.updateUser(authUpdates);
+        if (authError) throw authError;
+        
+        // Update local state to reflect the formatted phone number
+        const newAuth = { ...authFormData };
+        if (authUpdates.phone) {
+          newAuth.phone = authUpdates.phone;
+          setAuthFormData(newAuth);
+        }
+        setCurrentAuth(newAuth);
+        
+        // If email was updated, Supabase typically requires confirmation
+        if (authUpdates.email) {
+          alert("Bạn đã thay đổi email. Vui lòng kiểm tra hộp thư để xác nhận email mới.");
+        }
+      }
       
       setProfile(formData);
       setIsEditing(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating profile:", error);
-      alert("Có lỗi xảy ra khi cập nhật hồ sơ!");
+      alert(`Có lỗi xảy ra khi cập nhật hồ sơ! ${error.message || ""}`);
     } finally {
       setIsSaving(false);
     }
@@ -59,6 +93,7 @@ export function ProfileDetail({ profile: initialProfile }: ProfileDetailProps) {
 
   const handleCancel = () => {
     setFormData(profile);
+    setAuthFormData(currentAuth);
     setIsEditing(false);
   };
 
@@ -104,7 +139,7 @@ export function ProfileDetail({ profile: initialProfile }: ProfileDetailProps) {
               )}
               <p className="text-slate-500 flex items-center justify-center sm:justify-start gap-1.5 mt-0">
                 <Mail className="w-4 h-4" />
-                {profile.Email}
+                {currentAuth.email}
               </p>
             </div>
           </div>
@@ -124,13 +159,13 @@ export function ProfileDetail({ profile: initialProfile }: ProfileDetailProps) {
                     {isEditing ? (
                       <input
                         type="text"
-                        value={formData.PhoneNumber || ""}
-                        onChange={(e) => setFormData({...formData, PhoneNumber: e.target.value})}
+                        value={authFormData.phone}
+                        onChange={(e) => setAuthFormData({...authFormData, phone: e.target.value})}
                         className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-2 py-1 w-full focus:outline-none focus:border-primary"
                         placeholder="Nhập số điện thoại"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-slate-800">{profile.PhoneNumber || "Chưa cập nhật"}</p>
+                      <p className="text-sm font-medium text-slate-800">{currentAuth.phone || "Chưa cập nhật"}</p>
                     )}
                   </div>
                 </div>
@@ -141,7 +176,17 @@ export function ProfileDetail({ profile: initialProfile }: ProfileDetailProps) {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs text-slate-500 font-medium mb-0.5">Email đăng nhập</p>
-                    <p className="text-sm font-medium text-slate-800">{profile.Email}</p>
+                    {isEditing ? (
+                      <input
+                        type="email"
+                        value={authFormData.email}
+                        onChange={(e) => setAuthFormData({...authFormData, email: e.target.value})}
+                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-2 py-1 w-full focus:outline-none focus:border-primary"
+                        placeholder="Nhập email"
+                      />
+                    ) : (
+                      <p className="text-sm font-medium text-slate-800">{currentAuth.email}</p>
+                    )}
                   </div>
                 </div>
               </div>

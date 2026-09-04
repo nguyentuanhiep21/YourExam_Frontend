@@ -20,7 +20,7 @@ export default async function ProfilePage() {
   const { data, error } = await supabase
     .from("Profiles")
     .select("*")
-    .eq("Email", user.email)
+    .eq("Id", user.id)
     .single();
 
   let profile: Profile;
@@ -31,9 +31,7 @@ export default async function ProfilePage() {
     console.error("Error fetching profile from database:", error);
     profile = {
       Id: user.id,
-      Email: user.email || "",
       FullName: user.user_metadata?.full_name || "Chưa cập nhật tên",
-      PhoneNumber: user.phone || null,
       School: null,
       SubjectsTaught: null,
       AvatarUrl: user.user_metadata?.avatar_url || null,
@@ -51,7 +49,11 @@ export default async function ProfilePage() {
           <p className="text-slate-500 mt-2">Quản lý thông tin tài khoản và cài đặt cá nhân của bạn.</p>
         </div>
         
-        <ProfileDetail profile={profile} />
+        <ProfileDetail 
+          profile={profile} 
+          authEmail={user.email || ""} 
+          authPhone={user.phone ? (user.phone.startsWith("+") ? user.phone : `+${user.phone}`) : null} 
+        />
       </div>
     </div>
   );
