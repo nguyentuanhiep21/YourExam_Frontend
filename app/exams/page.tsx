@@ -33,7 +33,7 @@ export default async function DocumentsPage() {
     
     if (user && examIds.length > 0) {
       const { data: userVotes } = await supabase
-        .from("ExamVotes")
+        .from("ExamUpvotes")
         .select("ExamId")
         .eq("UserId", user.id)
         .in("ExamId", examIds);
@@ -70,7 +70,7 @@ export default async function DocumentsPage() {
     
     if (user && examIds.length > 0) {
       const { data: userVotes } = await supabase
-        .from("ExamVotes")
+        .from("ExamUpvotes")
         .select("ExamId")
         .eq("UserId", user.id)
         .in("ExamId", examIds);
@@ -107,7 +107,7 @@ export default async function DocumentsPage() {
       
       if (examIds.length > 0) {
         const { data: userVotes } = await supabase
-          .from("ExamVotes")
+          .from("ExamUpvotes")
           .select("ExamId")
           .eq("UserId", user.id)
           .in("ExamId", examIds);

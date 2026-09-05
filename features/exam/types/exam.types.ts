@@ -40,6 +40,7 @@ export interface GeneratedExam {
   // Navigation property for frontend use
   Questions?: GeneratedExamQuestion[];
   hasUpvoted?: boolean;
+  hasDownloaded?: boolean;
   Author?: { FullName: string } | { FullName: string }[];
 }
 

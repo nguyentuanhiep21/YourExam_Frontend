@@ -31,6 +31,7 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
   
   const [isDownloading, setIsDownloading] = useState(false);
   const [optimisticDownloadCount, setOptimisticDownloadCount] = useState(exam.DownloadCount);
+  const [hasDownloaded, setHasDownloaded] = useState(exam.hasDownloaded || false);
   
   // Local state for exam metadata
   const [title, setTitle] = useState(exam.Title);
@@ -150,11 +151,20 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
       a.remove();
       window.URL.revokeObjectURL(url);
 
-      const { incrementDownloadCount } = await import("../api/exam.actions");
-      const res = await incrementDownloadCount(exam.Id);
-      
-      if (res.newCount) {
-        setOptimisticDownloadCount(res.newCount);
+      if (!hasDownloaded && currentUserId) {
+        // Optimistic UI Update
+        setHasDownloaded(true);
+        setOptimisticDownloadCount(prev => prev + 1);
+
+        const { incrementDownloadCount } = await import("../api/exam.actions");
+        const res = await incrementDownloadCount(exam.Id);
+        
+        if (!res.success) {
+          // Rollback if failed
+          setHasDownloaded(false);
+          setOptimisticDownloadCount(prev => prev - 1);
+          console.error("Lỗi khi ghi nhận lượt tải vào DB:", res.message);
+        }
       }
     } catch (error: any) {
       console.error("Lỗi khi tải xuống:", error);
@@ -446,15 +456,27 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
                     : "text-emerald-600 bg-emerald-50 hover:bg-emerald-100 hover:shadow-md"
                 }`}
               >
-                <ThumbsUp className={`w-4 h-4 ${isUpvoting ? 'animate-bounce' : ''} ${hasUpvoted ? 'fill-current' : ''}`} />
+                {isUpvoting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <ThumbsUp className={`w-4 h-4 ${hasUpvoted ? 'fill-current' : ''}`} />
+                )}
                 <span>{optimisticUpvoteCount} <span className="hidden sm:inline">Upvotes</span></span>
               </button>
               <button 
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl font-medium shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 cursor-pointer"
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium shadow-sm transition-all disabled:opacity-50 cursor-pointer ${
+                  hasDownloaded 
+                    ? "text-white bg-blue-500 hover:bg-blue-600 hover:shadow-md" 
+                    : "text-blue-600 bg-blue-50 hover:bg-blue-100 hover:shadow-md"
+                }`}
               >
-                <Download className={`w-4 h-4 ${isDownloading ? 'animate-bounce' : ''}`} />
+                {isDownloading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className={`w-4 h-4 ${hasDownloaded ? 'fill-current' : ''}`} />
+                )}
                 <span>{optimisticDownloadCount} <span className="hidden sm:inline">Lượt tải</span></span>
               </button>
               

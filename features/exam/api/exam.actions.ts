@@ -107,24 +107,27 @@ export async function upvoteGeneratedExam(id: number, increment: boolean = true)
     throw new Error("Vui lòng đăng nhập để thực hiện thao tác này.");
   }
 
-  // 1. Cập nhật bảng ExamVotes
+  // 1. Cập nhật bảng ExamUpvotes
   if (increment) {
     const { error: insertError } = await supabase
-      .from("ExamVotes")
+      .from("ExamUpvotes")
       .insert({
         ExamId: id,
         UserId: user.id,
-        IsUpvote: true,
         CreatedAt: getGmt7IsoString()
       });
       
     if (insertError) {
+      if (insertError.code === '23505') {
+        // duplicate key, means already upvoted.
+        return { success: true, message: "Already upvoted" };
+      }
       console.error("Error inserting vote:", insertError);
       throw new Error("Failed to insert vote record");
     }
   } else {
     const { error: deleteError } = await supabase
-      .from("ExamVotes")
+      .from("ExamUpvotes")
       .delete()
       .eq("ExamId", id)
       .eq("UserId", user.id);
@@ -133,28 +136,6 @@ export async function upvoteGeneratedExam(id: number, increment: boolean = true)
       console.error("Error deleting vote:", deleteError);
       throw new Error("Failed to remove vote record");
     }
-  }
-
-  // 2. Cập nhật đếm UpvoteCount trên GeneratedExams
-  const { data: exam, error: fetchError } = await supabase
-    .from("GeneratedExams")
-    .select("UpvoteCount")
-    .eq("Id", id)
-    .single();
-
-  if (fetchError || !exam) {
-    throw new Error("Exam not found");
-  }
-
-  const newCount = Math.max(0, exam.UpvoteCount + (increment ? 1 : -1));
-
-  const { error: updateError } = await supabase
-    .from("GeneratedExams")
-    .update({ UpvoteCount: newCount })
-    .eq("Id", id);
-
-  if (updateError) {
-    throw new Error("Failed to upvote exam");
   }
 
   revalidatePath(`/exam/${id}`);
@@ -196,36 +177,16 @@ export async function incrementDownloadCount(id: number) {
     });
 
   if (insertError) {
+    if (insertError.code === '23505') {
+      // duplicate key, means already downloaded
+      return { success: true, message: "Already downloaded" };
+    }
     console.error("Error inserting download record:", insertError);
-    // If it's a unique constraint violation, it means they already downloaded it
-    // We can safely ignore and just return
-    return { success: true, message: "Already downloaded" };
-  }
-
-  // 3. Increment DownloadCount on GeneratedExams
-  const { data: exam, error: fetchError } = await supabase
-    .from("GeneratedExams")
-    .select("DownloadCount")
-    .eq("Id", id)
-    .single();
-
-  if (fetchError || !exam) {
-    throw new Error("Exam not found");
-  }
-
-  const newCount = (exam.DownloadCount || 0) + 1;
-
-  const { error: updateError } = await supabase
-    .from("GeneratedExams")
-    .update({ DownloadCount: newCount })
-    .eq("Id", id);
-
-  if (updateError) {
-    throw new Error("Failed to update download count");
+    return { success: false, message: "Failed to record download" };
   }
 
   revalidatePath(`/exam/${id}`);
-  return { success: true, newCount };
+  return { success: true };
 }
 
 /**

@@ -25,18 +25,30 @@ export async function getGeneratedExamById(id: number): Promise<GeneratedExam | 
 
   const examData = data as GeneratedExam;
 
-  // Check if current user has upvoted
+  // Check if current user has upvoted & downloaded
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
-    const { data: vote } = await supabase
-      .from("ExamVotes")
-      .select("ExamId")
-      .eq("ExamId", id)
-      .eq("UserId", user.id)
-      .single();
-      
-    if (vote) {
+    const [voteRes, downloadRes] = await Promise.all([
+      supabase
+        .from("ExamUpvotes")
+        .select("ExamId")
+        .eq("ExamId", id)
+        .eq("UserId", user.id)
+        .single(),
+      supabase
+        .from("ExamDownloads")
+        .select("ExamId")
+        .eq("ExamId", id)
+        .eq("UserId", user.id)
+        .single()
+    ]);
+
+    if (voteRes.data) {
       examData.hasUpvoted = true;
+    }
+    
+    if (downloadRes.data) {
+      examData.hasDownloaded = true;
     }
   }
 
