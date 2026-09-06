@@ -47,7 +47,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onClick })
       </div>
       
       <div className="flex-1 relative z-10">
-        <h3 className="font-semibold font-heading text-slate-900 text-lg leading-tight line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+        <h3 className="font-semibold font-heading text-slate-900 text-lg leading-tight line-clamp-2 break-all mb-2 group-hover:text-primary transition-colors">
           {document.FileName}
         </h3>
         <p className="text-sm text-slate-500 font-body">
@@ -55,14 +55,11 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document, onClick })
         </p>
       </div>
 
-      <div className="mt-5 pt-4 border-t border-slate-100/80 flex items-center justify-between text-sm text-slate-500 relative z-10 font-body">
-        <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-full bg-primary-light/50 text-primary flex items-center justify-center font-bold text-xs uppercase shadow-sm">
-            {document.Author?.FullName?.[0] || 'U'}
-          </div>
-          <span className="truncate max-w-[100px] font-medium">{document.Author?.FullName || 'Unknown'}</span>
-        </div>
-        <span className="text-xs font-medium">{new Date(document.CreatedAt).toLocaleDateString('vi-VN')}</span>
+      <div className="mt-5 pt-4 border-t border-slate-100/80 flex items-center justify-between text-sm relative z-10 font-body">
+        <p className="text-slate-600 font-medium truncate max-w-[150px]">
+          bởi <span className="font-semibold text-primary/80">{document.Author?.FullName || 'Khuyết danh'}</span>
+        </p>
+        <span className="text-slate-500 text-xs font-medium">{new Date(document.CreatedAt).toLocaleDateString('vi-VN')}</span>
       </div>
     </div>
   );

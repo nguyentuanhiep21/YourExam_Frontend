@@ -118,7 +118,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({ docu
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <a 
-              href={document.FileUrl} 
+              href={isWord || isExcel || isPowerPoint ? getOfficeViewerUrl(document.FileUrl) : document.FileUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors flex items-center gap-2"

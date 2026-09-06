@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { Upload, Search, FileText, Loader2, AlertCircle, LayoutGrid, List } from 'lucide-react';
+import { Upload, Search, FileText, Loader2, AlertCircle, LayoutGrid, List, Library } from 'lucide-react';
 import { useToast } from "@/components/ui/alerts/toast-context";
 import { useDocuments } from '@/features/documents/hooks/useDocuments';
 import { useUploadDocument } from '@/features/documents/hooks/useUploadDocument';
@@ -78,11 +78,12 @@ export default function DocumentsClient() {
       {/* Header Section: Bold Minimalism */}
       <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-5xl font-extrabold text-slate-900 mb-4 tracking-tight font-heading">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 flex items-center gap-3 mb-4 tracking-tight font-heading">
+            <Library className="w-10 h-10 text-primary" />
             Kho Tài Liệu
           </h1>
           <p className="text-lg text-slate-500 max-w-2xl font-body">
-            Quản lý, xem trước và chia sẻ tài liệu học tập của bạn. Hỗ trợ đa dạng các định dạng từ PDF, Word, Excel đến hình ảnh.
+            Chia sẻ tài liệu học tập của bạn với cộng đồng, mọi tài liệu được đăng tải đều công khai. Hỗ trợ các định dạng gồm PDF và Word.
           </p>
         </div>
         
