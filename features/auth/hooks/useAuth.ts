@@ -11,8 +11,9 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
 
   // Hàm hỗ trợ dịch lỗi Supabase sang tiếng Việt
-  const handleAuthError = (err: any) => {
-    const msg = err.message?.toLowerCase() || "";
+  const handleAuthError = (err: unknown) => {
+    const msg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+    
     if (msg.includes("60 seconds") || msg.includes("security purposes")) {
       setError("Vì lý do bảo mật, bạn chỉ có thể gửi yêu cầu mỗi 60 giây một lần.");
     } else if (msg.includes("invalid login credentials")) {
