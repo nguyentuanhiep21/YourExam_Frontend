@@ -4,7 +4,7 @@ import React, { useState, useCallback, useRef } from "react";
 import Cropper from "react-easy-crop";
 import { X, Upload, Check, Loader2, Image as ImageIcon } from "lucide-react";
 import getCroppedImg from "../utils/cropImage";
-import { createClient } from "@/lib/supabase/client";
+import { profileApi } from "../api/profile.api";
 
 interface AvatarUpdateDialogProps {
   isOpen: boolean;
@@ -46,42 +46,8 @@ export function AvatarUpdateDialog({ isOpen, onClose, userId, onAvatarUpdated }:
       const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
       if (!croppedBlob) throw new Error("Không thể cắt ảnh");
 
-      // 2. Upload to Supabase Storage
-      const supabase = createClient();
-      
-      // Policy requires: (storage.foldername(name))[1] = (select auth.uid()::text)
-      // So path should be: {userId}/avatar.jpg
-      const filePath = `${userId}/avatar.jpg`;
-      
-      const { data, error } = await supabase.storage
-        .from("UserAvatar")
-        .upload(filePath, croppedBlob, {
-          contentType: "image/jpeg",
-          upsert: true,
-          cacheControl: "0"
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      // 3. Get Public URL
-      const { data: publicUrlData } = supabase.storage
-        .from("UserAvatar")
-        .getPublicUrl(filePath);
-        
-      // Append a timestamp to break browser cache if they upload a new one
-      const finalUrl = `${publicUrlData.publicUrl}?t=${Date.now()}`;
-
-      // 4. Update Profiles table
-      const { error: profileError } = await supabase
-        .from("Profiles")
-        .update({ AvatarUrl: finalUrl })
-        .eq("Id", userId);
-
-      if (profileError) {
-        throw profileError;
-      }
+      // 2. Upload and Update Profile via API
+      const finalUrl = await profileApi.uploadProfileImage(userId, croppedBlob, "avatar");
 
       onAvatarUpdated(finalUrl);
       resetState();

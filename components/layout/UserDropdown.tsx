@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, KeyRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -51,6 +51,15 @@ export function UserDropdown({ email }: UserDropdownProps) {
                 Thông tin tài khoản
               </Link>
               
+              <Link
+                href="/profile/change-password"
+                onClick={() => setIsOpen(false)}
+                className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-3 hover:bg-slate-50 hover:text-slate-900 text-gray-700"
+              >
+                <KeyRound className="w-4 h-4" />
+                Đổi mật khẩu
+              </Link>
+
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-3 hover:bg-red-50 hover:text-red-600 text-gray-700"

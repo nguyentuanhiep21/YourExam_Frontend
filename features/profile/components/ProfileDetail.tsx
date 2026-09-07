@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Profile } from "../types";
 import { User, Mail, Phone, School, BookOpen, Calendar, Edit3, X, Save, Camera } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { profileApi } from "../api/profile.api";
 import { AvatarUpdateDialog } from "./AvatarUpdateDialog";
 import { CoverImageUpdateDialog } from "./CoverImageUpdateDialog";
 
@@ -43,47 +43,43 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
 
   const handleSave = async () => {
     setIsSaving(true);
-    const supabase = createClient();
     
     try {
-      const { error: profileError } = await supabase
-        .from("Profiles")
-        .update({
-          FullName: formData.FullName,
-          School: formData.School,
-          SubjectsTaught: formData.SubjectsTaught,
-        })
-        .eq("Id", profile.Id);
+      // 1. Update Profile DB
+      await profileApi.updateProfile(profile.Id, {
+        FullName: formData.FullName,
+        School: formData.School,
+        SubjectsTaught: formData.SubjectsTaught,
+      });
 
-      if (profileError) throw profileError;
-
-      // Update Auth (Email and Phone)
-      const authUpdates: any = {};
-      if (authFormData.email !== currentAuth.email) authUpdates.email = authFormData.email;
-      
+      // 2. Update Auth (Email and Phone)
       let rawPhone = authFormData.phone;
+      let newPhone = undefined;
+      let newEmail = undefined;
+
+      if (authFormData.email !== currentAuth.email) newEmail = authFormData.email;
+      
       if (rawPhone !== currentAuth.phone) {
         let formattedPhone = rawPhone.trim();
         if (formattedPhone.startsWith('0')) {
           formattedPhone = '+84' + formattedPhone.substring(1);
         }
-        authUpdates.phone = formattedPhone;
+        newPhone = formattedPhone;
       }
 
-      if (Object.keys(authUpdates).length > 0) {
-        const { error: authError } = await supabase.auth.updateUser(authUpdates);
-        if (authError) throw authError;
+      if (newEmail || newPhone) {
+        await profileApi.updateAuthDetails(newEmail, newPhone);
         
         // Update local state to reflect the formatted phone number
         const newAuth = { ...authFormData };
-        if (authUpdates.phone) {
-          newAuth.phone = authUpdates.phone;
+        if (newPhone) {
+          newAuth.phone = newPhone;
           setAuthFormData(newAuth);
         }
         setCurrentAuth(newAuth);
         
         // If email was updated, Supabase typically requires confirmation
-        if (authUpdates.email) {
+        if (newEmail) {
           alert("Bạn đã thay đổi email. Vui lòng kiểm tra hộp thư để xác nhận email mới.");
         }
       }
