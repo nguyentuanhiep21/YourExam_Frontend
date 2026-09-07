@@ -135,7 +135,7 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
         exercises: (exam.Questions || []).map(q => ({
           content: q.QuestionContent,
           choices: q.MultipleChoiceOptions ? JSON.parse(q.MultipleChoiceOptions) : [],
-          correctAnswer: q.CorrectAnswer,
+          correctAnswer: q.CorrectAnswer || "",
           exerciseType: q.QuestionType || 0
         }))
       };

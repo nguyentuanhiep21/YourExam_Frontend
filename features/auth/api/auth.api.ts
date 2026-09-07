@@ -1,16 +1,16 @@
 import { createClient } from "@/lib/supabase/client";
-import { AuthTokenResponseV1, UserResponse, User, AuthError } from "@supabase/supabase-js";
+import { AuthResponse, UserResponse, User, AuthError } from "@supabase/supabase-js";
 
 class AuthApi {
   private getSupabase() {
     return createClient();
   }
 
-  async signIn(email: string, password: string): Promise<AuthTokenResponseV1> {
+  async signIn(email: string, password: string): Promise<AuthResponse> {
     return this.getSupabase().auth.signInWithPassword({ email, password });
   }
 
-  async signUp(email: string, password: string): Promise<AuthTokenResponseV1> {
+  async signUp(email: string, password: string): Promise<AuthResponse> {
     return this.getSupabase().auth.signUp({
       email,
       password,

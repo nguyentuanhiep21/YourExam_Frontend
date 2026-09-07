@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Check, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Loader2, Check, Lock, ArrowRight, Eye, EyeOff, X } from "lucide-react";
 import { profileApi } from "../api/profile.api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

@@ -57,14 +57,14 @@ export default async function DocumentsPage() {
     trendingExams = top10Trending.map((exam: unknown) => {
       const e = exam as ExamQueryResult;
       return {
-      id: exam.Id.toString(),
-      title: exam.Title || "Đề thi chưa đặt tên",
-      subject: exam.Subject || "Chung",
-      grade: `Lớp ${exam.GradeLevel}`,
-      downloads: exam.DownloadCount || 0,
-      upvotes: exam.UpvoteCount || 0,
-      tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
-      hasUpvoted: votedExamIds.has(exam.Id),
+      id: e.Id.toString(),
+      title: e.Title || "Đề thi chưa đặt tên",
+      subject: e.Subject || "Chung",
+      grade: `Lớp ${e.GradeLevel}`,
+      downloads: e.DownloadCount || 0,
+      upvotes: e.UpvoteCount || 0,
+      tags: [e.Subject, `Lớp ${e.GradeLevel}`].filter(Boolean),
+      hasUpvoted: votedExamIds.has(e.Id),
       authorName: (Array.isArray(e.Author) ? e.Author[0]?.FullName : (e.Author as { FullName: string })?.FullName) || "Khuyết danh"
     };
   });
@@ -97,14 +97,14 @@ export default async function DocumentsPage() {
     newExams = publicExamsData.map((exam: unknown) => {
       const e = exam as ExamQueryResult;
       return {
-      id: exam.Id.toString(),
-      title: exam.Title || "Đề thi chưa đặt tên",
-      subject: exam.Subject || "Chung",
-      grade: `Lớp ${exam.GradeLevel}`,
-      downloads: exam.DownloadCount || 0,
-      upvotes: exam.UpvoteCount || 0,
-      tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
-      hasUpvoted: votedExamIds.has(exam.Id),
+      id: e.Id.toString(),
+      title: e.Title || "Đề thi chưa đặt tên",
+      subject: e.Subject || "Chung",
+      grade: `Lớp ${e.GradeLevel}`,
+      downloads: e.DownloadCount || 0,
+      upvotes: e.UpvoteCount || 0,
+      tags: [e.Subject, `Lớp ${e.GradeLevel}`].filter(Boolean),
+      hasUpvoted: votedExamIds.has(e.Id),
       authorName: (Array.isArray(e.Author) ? e.Author[0]?.FullName : (e.Author as { FullName: string })?.FullName) || "Khuyết danh"
     };
   });

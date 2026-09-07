@@ -134,10 +134,10 @@ export const useCreateExamModal = () => {
   const handleEditBlueprint = (bp: ExamBlueprint) => {
     setEditingBlueprintId(bp.Id);
     setBlueprintName(bp.Name);
-    const mappedRules = (bp.BlueprintRules || []).map((rule: ExamBlueprintRule) => {
+    const mappedRules: CustomRule[] = (bp.BlueprintRules || []).map((rule: ExamBlueprintRule) => {
       const diffName = rule.Difficulty === QuestionDifficulty.Easy ? "Dễ" : rule.Difficulty === QuestionDifficulty.Medium ? "Trung bình" : "Khó";
       const diffId = rule.Difficulty === QuestionDifficulty.Easy ? "easy" : rule.Difficulty === QuestionDifficulty.Medium ? "medium" : "hard";
-      const format = rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem";
+      const format = (rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem") as "tu-luan" | "trac-nghiem";
       return {
         id: rule.Id.toString(),
         diffId,
@@ -153,10 +153,10 @@ export const useCreateExamModal = () => {
   const handleSelectSystemBlueprint = (bp: ExamBlueprint) => {
     setEditingBlueprintId(null);
     setBlueprintName(`Bản sao của ${bp.Name}`);
-    const mappedRules = (bp.BlueprintRules || []).map((rule: ExamBlueprintRule) => {
+    const mappedRules: CustomRule[] = (bp.BlueprintRules || []).map((rule: ExamBlueprintRule) => {
       const diffName = rule.Difficulty === QuestionDifficulty.Easy ? "Dễ" : rule.Difficulty === QuestionDifficulty.Medium ? "Trung bình" : "Khó";
       const diffId = rule.Difficulty === QuestionDifficulty.Easy ? "easy" : rule.Difficulty === QuestionDifficulty.Medium ? "medium" : "hard";
-      const format = rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem";
+      const format = (rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem") as "tu-luan" | "trac-nghiem";
       return {
         id: Date.now().toString() + Math.random().toString().slice(2, 6),
         diffId,
