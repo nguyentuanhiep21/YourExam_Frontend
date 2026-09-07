@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { authApi } from "../api/auth.api";
 
 export function useAuth() {
   const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +36,7 @@ export function useAuth() {
   async function signIn(email: string, password: string) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await authApi.signIn(email, password);
     if (error) {
       handleAuthError(error);
     } else {
@@ -50,13 +49,7 @@ export function useAuth() {
   async function signUp(email: string, password: string) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signUp({ 
-      email, 
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/api/auth/callback`
-      }
-    });
+    const { error } = await authApi.signUp(email, password);
     if (error) {
       handleAuthError(error);
     } else {
@@ -67,21 +60,19 @@ export function useAuth() {
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
+    await authApi.signOut();
     router.push("/login");
     router.refresh();
   }
 
   async function getUser(): Promise<User | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+    return authApi.getUser();
   }
+
   async function resetPasswordForEmail(email: string) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/api/auth/callback?next=/reset-password`,
-    });
+    const { error } = await authApi.resetPasswordForEmail(email);
     if (error) {
       handleAuthError(error);
     }
@@ -92,12 +83,12 @@ export function useAuth() {
   async function updatePassword(password: string) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await authApi.updatePassword(password);
     if (error) {
       handleAuthError(error);
     } else {
       // Force user to log in again after changing password
-      await supabase.auth.signOut();
+      await authApi.signOut();
       router.push("/login?passwordChanged=true");
     }
     setLoading(false);

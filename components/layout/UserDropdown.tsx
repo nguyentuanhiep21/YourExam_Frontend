@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { LogOut, User, KeyRound } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { authApi } from "@/features/auth/api/auth.api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -15,8 +15,7 @@ export function UserDropdown({ email }: UserDropdownProps) {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await authApi.signOut();
     router.refresh();
     router.push("/login");
   };
