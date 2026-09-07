@@ -62,7 +62,7 @@ export const documentApi = {
       throw new Error(`Save document to DB failed: ${error.message}`);
     }
 
-    return data as any;
+    return data as unknown as UserDocument;
   },
 
   /**
@@ -80,6 +80,6 @@ export const documentApi = {
       throw new Error(`Get documents failed: ${error.message}`);
     }
 
-    return data as any;
+    return data as unknown as UserDocument[];
   }
 };

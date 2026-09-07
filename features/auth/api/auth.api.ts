@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import { AuthTokenResponseV1, UserResponse, User } from "@supabase/supabase-js";
+import { AuthTokenResponseV1, UserResponse, User, AuthError } from "@supabase/supabase-js";
 
 class AuthApi {
   private getSupabase() {
@@ -20,7 +20,7 @@ class AuthApi {
     });
   }
 
-  async signOut(): Promise<{ error: any }> {
+  async signOut(): Promise<{ error: AuthError | null }> {
     return this.getSupabase().auth.signOut();
   }
 
