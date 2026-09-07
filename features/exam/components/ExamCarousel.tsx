@@ -2,13 +2,13 @@
 
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ExamMockData } from "../types/exam.types";
+import { ExamSummary } from "../types/exam.types";
 import { ExamCard } from "./ExamCard";
 
 interface ExamCarouselProps {
   title: string;
   subtitle?: string;
-  exams: ExamMockData[];
+  exams: ExamSummary[];
   emoji?: string;
 }
 

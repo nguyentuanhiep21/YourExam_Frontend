@@ -59,7 +59,7 @@ export interface UpdateGeneratedExamQuestionPayload {
   MultipleChoiceOptions?: string;
 }
 
-export interface ExamMockData {
+export interface ExamSummary {
   id: string;
   title: string;
   subject: string;

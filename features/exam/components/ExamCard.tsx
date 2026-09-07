@@ -1,7 +1,7 @@
 "use client";
 
 import { Download, ThumbsUp } from "lucide-react";
-import { ExamMockData } from "../types/exam.types";
+import { ExamSummary } from "../types/exam.types";
 import Link from "next/link";
 
 // Helper function to format numbers (e.g. 12000 -> 12K)
@@ -13,7 +13,7 @@ function formatNumber(num: number): string {
 }
 
 interface ExamCardProps {
-  exam: ExamMockData;
+  exam: ExamSummary;
 }
 
 export function ExamCard({ exam }: ExamCardProps) {

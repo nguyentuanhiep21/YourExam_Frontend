@@ -28,8 +28,7 @@ export default async function ProfilePage() {
   let profile: Profile;
 
   if (error || !data) {
-    // If not found in DB or error (maybe new user hasn't been synced?), we can fallback to auth user info
-    // However, since we are designing, it's fine to provide a mock fallback if it fails for design review
+    // If not found in DB or error (e.g., new user profile hasn't been synced), fallback to auth user info
     console.error("Error fetching profile from database:", error);
     profile = {
       Id: user.id,
