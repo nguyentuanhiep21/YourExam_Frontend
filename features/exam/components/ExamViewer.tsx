@@ -41,7 +41,7 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
   const [isPublic, setIsPublic] = useState(exam.IsPublic);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
-  const authorName = (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as any)?.FullName) || "Khuyết danh";
+  const authorName = (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as { FullName: string })?.FullName) || "Khuyết danh";
   
   // Local state for questions
   const [editedQuestions, setEditedQuestions] = useState<Record<number, Partial<GeneratedExamQuestion>>>({});
@@ -87,8 +87,8 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
       setIsEditing(false);
       setEditedQuestions({});
       toast.success("Đã lưu thay đổi đề thi", "Thành công");
-    } catch (error: any) {
-      toast.error(error.message || "Đã xảy ra lỗi khi lưu đề thi.", "Lỗi lưu đề thi");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi khi lưu đề thi.", "Lỗi lưu đề thi");
     } finally {
       setIsSaving(false);
     }
@@ -166,9 +166,9 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
           console.error("Lỗi khi ghi nhận lượt tải vào DB:", res.message);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Lỗi khi tải xuống:", error);
-      if (error.message?.includes("đăng nhập")) {
+      if (error instanceof Error && error.message?.includes("đăng nhập")) {
         toast.warning("Vui lòng đăng nhập để tải đề thi.", "Yêu cầu đăng nhập");
       } else {
         toast.error("Đã xảy ra lỗi khi tải đề thi.", "Lỗi tải xuống");

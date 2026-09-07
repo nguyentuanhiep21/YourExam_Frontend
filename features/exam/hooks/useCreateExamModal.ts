@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { CustomRule } from "../types/createExam.types";
+import { CustomRule, ExamBlueprint, GeneratedQuestion, ExamBlueprintRule } from "../types/createExam.types";
 import { EXERCISE_TYPES, SUBJECT_CODE_MAP, getExerciseTypes, QuestionFormat, QuestionDifficulty } from "../constants/createExam.constants";
 import { createExamApi } from "../api/createExam.api";
 import { getGmt7IsoString } from "@/utils/time";
@@ -23,14 +23,14 @@ export const useCreateExamModal = () => {
   const [isGeneratingWizard, setIsGeneratingWizard] = useState(false);
   const [currentRuleIndex, setCurrentRuleIndex] = useState(0);
   const [distributionState, setDistributionState] = useState<Record<string, Record<number, number>>>({});
-  const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
+  const [generatedQuestions, setGeneratedQuestions] = useState<GeneratedQuestion[]>([]);
   const [isGeneratingExamAPI, setIsGeneratingExamAPI] = useState(false);
   const [isSavingExam, setIsSavingExam] = useState(false);
   const [showSaveExamDialog, setShowSaveExamDialog] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
   // Supabase states
-  const [savedBlueprints, setSavedBlueprints] = useState<any[]>([]);
+  const [savedBlueprints, setSavedBlueprints] = useState<ExamBlueprint[]>([]);
   const [isLoadingBlueprints, setIsLoadingBlueprints] = useState(false);
   const [blueprintName, setBlueprintName] = useState("");
   const [editingBlueprintId, setEditingBlueprintId] = useState<number | null>(null);
@@ -38,7 +38,7 @@ export const useCreateExamModal = () => {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
 
   // System templates
-  const [systemBlueprints, setSystemBlueprints] = useState<any[]>([]);
+  const [systemBlueprints, setSystemBlueprints] = useState<ExamBlueprint[]>([]);
   const [isLoadingSystemBlueprints, setIsLoadingSystemBlueprints] = useState(false);
 
   useEffect(() => {
@@ -114,8 +114,8 @@ export const useCreateExamModal = () => {
       setBlueprintName("");
       setEditingBlueprintId(null);
       setStructureType("saved");
-    } catch (err: any) {
-      toast.error(err.message, "Lỗi khi lưu cấu trúc");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Đã xảy ra lỗi.", "Lỗi khi lưu cấu trúc");
     } finally {
       setIsSavingBlueprint(false);
     }
@@ -126,15 +126,15 @@ export const useCreateExamModal = () => {
       const { error } = await createExamApi.deleteBlueprint(id);
       if (error) throw error;
       setSavedBlueprints(prev => prev.filter(bp => bp.Id !== id));
-    } catch (err: any) {
-      toast.error(err.message, "Lỗi khi xóa cấu trúc đề");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Đã xảy ra lỗi.", "Lỗi khi xóa cấu trúc đề");
     }
   };
 
-  const handleEditBlueprint = (bp: any) => {
+  const handleEditBlueprint = (bp: ExamBlueprint) => {
     setEditingBlueprintId(bp.Id);
     setBlueprintName(bp.Name);
-    const mappedRules = (bp.BlueprintRules || []).map((rule: any) => {
+    const mappedRules = (bp.BlueprintRules || []).map((rule: ExamBlueprintRule) => {
       const diffName = rule.Difficulty === QuestionDifficulty.Easy ? "Dễ" : rule.Difficulty === QuestionDifficulty.Medium ? "Trung bình" : "Khó";
       const diffId = rule.Difficulty === QuestionDifficulty.Easy ? "easy" : rule.Difficulty === QuestionDifficulty.Medium ? "medium" : "hard";
       const format = rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem";
@@ -150,10 +150,10 @@ export const useCreateExamModal = () => {
     setStructureType("custom");
   };
 
-  const handleSelectSystemBlueprint = (bp: any) => {
+  const handleSelectSystemBlueprint = (bp: ExamBlueprint) => {
     setEditingBlueprintId(null);
     setBlueprintName(`Bản sao của ${bp.Name}`);
-    const mappedRules = (bp.BlueprintRules || []).map((rule: any) => {
+    const mappedRules = (bp.BlueprintRules || []).map((rule: ExamBlueprintRule) => {
       const diffName = rule.Difficulty === QuestionDifficulty.Easy ? "Dễ" : rule.Difficulty === QuestionDifficulty.Medium ? "Trung bình" : "Khó";
       const diffId = rule.Difficulty === QuestionDifficulty.Easy ? "easy" : rule.Difficulty === QuestionDifficulty.Medium ? "medium" : "hard";
       const format = rule.QuestionFormat === QuestionFormat.Essay ? "tu-luan" : "trac-nghiem";
@@ -229,7 +229,7 @@ export const useCreateExamModal = () => {
         "Lớp 1": 1, "Lớp 2": 2, "Lớp 3": 3, "Lớp 4": 4, "Lớp 5": 5
       };
 
-      const promises: Promise<any>[] = [];
+      const promises: Promise<{success: boolean, data?: GeneratedQuestion[], errorMessage?: string}>[] = [];
 
       for (const rule of customRules) {
         const dist = distributionState[rule.id];
@@ -250,7 +250,7 @@ export const useCreateExamModal = () => {
             promises.push(
               createExamApi.generateExercises(payload).then(res => {
                 if (res.success && res.data) {
-                  res.data = res.data.map((q: any) => ({ ...q, format: rule.format, exerciseType: typeId }));
+                  res.data = res.data.map((q: GeneratedQuestion) => ({ ...q, format: rule.format, exerciseType: typeId }));
                 }
                 return res;
               })
@@ -260,7 +260,7 @@ export const useCreateExamModal = () => {
       }
 
       const results = await Promise.all(promises);
-      let allQuestions: any[] = [];
+      let allQuestions: GeneratedQuestion[] = [];
       let hasError = false;
       let errorMsg = "";
 
@@ -287,8 +287,8 @@ export const useCreateExamModal = () => {
 
       setGeneratedQuestions(allQuestions);
       setIsGeneratingWizard(false);
-    } catch (err: any) {
-      toast.error(err.message || String(err), "Có lỗi xảy ra khi tạo đề thi");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err), "Có lỗi xảy ra khi tạo đề thi");
     } finally {
       setIsGeneratingExamAPI(false);
     }
@@ -326,8 +326,8 @@ export const useCreateExamModal = () => {
       await createExamApi.saveGeneratedExam(payload, user.id);
       toast.success("Lưu đề thi vào hệ thống thành công!");
       setShowSaveExamDialog(false);
-    } catch (err: any) {
-      toast.error(err.message, "Lỗi khi lưu đề thi");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Đã xảy ra lỗi.", "Lỗi khi lưu đề thi");
     } finally {
       setIsSavingExam(false);
     }
@@ -362,8 +362,8 @@ export const useCreateExamModal = () => {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch (err: any) {
-      toast.error(err.message || String(err), "Lỗi khi tải file DOCX");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err), "Lỗi khi tải file DOCX");
     } finally {
       setIsExporting(false);
     }

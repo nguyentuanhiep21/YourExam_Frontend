@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import { GenerateExerciseRequestDto, CreateBlueprintRuleDto } from "../types/createExam.types";
+import { GenerateExerciseRequestDto, CreateBlueprintRuleDto, ExamBlueprint, GeneratedQuestion } from "../types/createExam.types";
 
 export const createExamApi = {
   async fetchBlueprints(userId: string) {
@@ -60,7 +60,7 @@ export const createExamApi = {
     return res.json();
   },
 
-  async exportToDocx(payload: { fileName: string, exercises: any[] }) {
+  async exportToDocx(payload: { fileName: string, exercises: GeneratedQuestion[] }) {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
     const res = await fetch(`${baseUrl}/exercises/export/docx`, {
       method: "POST",
@@ -84,7 +84,7 @@ export const createExamApi = {
     return res.blob();
   },
 
-  async saveGeneratedExam(payload: any, userId: string) {
+  async saveGeneratedExam(payload: { title: string, gradeLevel: number, subject: string, durationMinutes: number, totalScore: number, difficulty: number, blueprintId: number | null, createdAt: string, questions: GeneratedQuestion[] }, userId: string) {
     const supabase = createClient();
     
     // Insert metadata
@@ -105,7 +105,7 @@ export const createExamApi = {
     if (examError) throw examError;
 
     // Insert questions
-    const questions = payload.questions.map((q: any, index: number) => ({
+    const questions = payload.questions.map((q: GeneratedQuestion, index: number) => ({
       GeneratedExamId: examData.Id,
       OrderIndex: index + 1,
       QuestionType: q.format === "tu-luan" ? 2 : 1,

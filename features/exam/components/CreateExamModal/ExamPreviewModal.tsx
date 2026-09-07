@@ -1,15 +1,16 @@
 import { X, Loader2, Download, Edit2, Save, XCircle } from "lucide-react";
 import { useState } from "react";
+import { GeneratedQuestion } from "../../types/createExam.types";
 
 interface Props {
-  generatedQuestions: any[];
+  generatedQuestions: GeneratedQuestion[];
   isExporting?: boolean;
-  onSetGeneratedQuestions: (questions: any[]) => void;
+  onSetGeneratedQuestions: (questions: GeneratedQuestion[]) => void;
   onDownloadDocx?: () => void;
   onSetShowSaveExamDialog?: (val: boolean) => void;
 }
 
-const QuestionItem = ({ q, idx, onSave }: { q: any, idx: number, onSave: (updatedQ: any) => void }) => {
+const QuestionItem = ({ q, idx, onSave }: { q: GeneratedQuestion, idx: number, onSave: (updatedQ: GeneratedQuestion) => void }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(q.content);
   const [editedChoices, setEditedChoices] = useState<string[]>(q.choices || []);
@@ -147,7 +148,7 @@ const QuestionItem = ({ q, idx, onSave }: { q: any, idx: number, onSave: (update
 export const ExamPreviewModal = ({ generatedQuestions, isExporting, onSetGeneratedQuestions, onDownloadDocx, onSetShowSaveExamDialog }: Props) => {
   if (generatedQuestions.length === 0) return null;
 
-  const handleUpdateQuestion = (index: number, updatedQ: any) => {
+  const handleUpdateQuestion = (index: number, updatedQ: GeneratedQuestion) => {
     const newList = [...generatedQuestions];
     newList[index] = updatedQ;
     onSetGeneratedQuestions(newList);

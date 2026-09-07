@@ -63,7 +63,7 @@ export async function updateGeneratedExam(
     // Loop through and update each question. We enforce that the question belongs to this specific exam.
     for (const question of questionsPayload) {
       // Build the update object dynamically based on provided fields
-      const updateData: any = {};
+      const updateData: Partial<UpdateGeneratedExamQuestionPayload> = {};
       if (question.QuestionContent !== undefined) updateData.QuestionContent = question.QuestionContent;
       if (question.CorrectAnswer !== undefined) updateData.CorrectAnswer = question.CorrectAnswer;
       if (question.MultipleChoiceOptions !== undefined) updateData.MultipleChoiceOptions = question.MultipleChoiceOptions;

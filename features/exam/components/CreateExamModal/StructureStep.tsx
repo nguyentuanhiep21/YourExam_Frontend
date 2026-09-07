@@ -1,11 +1,11 @@
 import { Loader2, Trash2, Save } from "lucide-react";
-import { CustomRule } from "../../types/createExam.types";
+import { CustomRule, ExamBlueprint } from "../../types/createExam.types";
 
 interface Props {
   selectedGrade: string | null;
   selectedSubject: string | null;
   structureType: "template" | "custom" | "saved" | null;
-  savedBlueprints: any[];
+  savedBlueprints: ExamBlueprint[];
   isLoadingBlueprints: boolean;
   deletingId: number | null;
   customRules: CustomRule[];
@@ -18,14 +18,14 @@ interface Props {
   onSetBlueprintName: (name: string) => void;
   onSetEditingBlueprintId: (id: number | null) => void;
   onDeleteBlueprint: (id: number) => void;
-  onEditBlueprint: (bp: any) => void;
+  onEditBlueprint: (bp: ExamBlueprint) => void;
   onUpdateQuantity: (id: string, delta: number) => void;
   onRemoveRule: (id: string) => void;
   onSetIsAddingQuestion: (val: boolean) => void;
   onSetShowSaveDialog: (val: boolean) => void;
-  systemBlueprints?: any[];
+  systemBlueprints?: ExamBlueprint[];
   isLoadingSystemBlueprints?: boolean;
-  onSelectSystemBlueprint?: (bp: any) => void;
+  onSelectSystemBlueprint?: (bp: ExamBlueprint) => void;
 }
 
 export const StructureStep = ({

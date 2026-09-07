@@ -10,6 +10,31 @@ export interface CustomRule {
   quantity: number;
 }
 
+export interface ExamBlueprintRule {
+  Id: number;
+  Difficulty: number;
+  QuestionFormat: number;
+  Quantity: number;
+}
+
+export interface ExamBlueprint {
+  Id: number;
+  Name: string;
+  IsSystemProvided?: boolean;
+  BlueprintRules?: ExamBlueprintRule[];
+}
+
+export interface GeneratedQuestion {
+  content: string;
+  choices?: string[];
+  correctAnswer: string;
+  explanation?: string;
+  score?: number;
+  format?: "tu-luan" | "trac-nghiem";
+  exerciseType?: number;
+  difficulty?: number;
+}
+
 // Request DTOs
 export interface GenerateExerciseRequestDto {
   subject: string;
