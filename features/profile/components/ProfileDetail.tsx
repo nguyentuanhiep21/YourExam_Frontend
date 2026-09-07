@@ -86,9 +86,10 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
       
       setProfile(formData);
       setIsEditing(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating profile:", error);
-      alert(`Có lỗi xảy ra khi cập nhật hồ sơ! ${error.message || ""}`);
+      const msg = error instanceof Error ? error.message : "";
+      alert(`Có lỗi xảy ra khi cập nhật hồ sơ! ${msg}`);
     } finally {
       setIsSaving(false);
     }

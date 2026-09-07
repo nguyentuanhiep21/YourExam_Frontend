@@ -13,9 +13,9 @@ export const useDocuments = () => {
     try {
       const data = await documentApi.getDocuments();
       setDocuments(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to fetch documents:', err);
-      setError(err.message || 'Lỗi khi tải danh sách tài liệu');
+      setError(err instanceof Error ? err.message : 'Lỗi khi tải danh sách tài liệu');
     } finally {
       setIsLoading(false);
     }

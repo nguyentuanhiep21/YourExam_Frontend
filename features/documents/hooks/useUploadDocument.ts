@@ -40,9 +40,9 @@ export const useUploadDocument = () => {
       );
 
       return savedDoc;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error uploading document:", err);
-      setError(err.message || "Đã xảy ra lỗi trong quá trình tải lên.");
+      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi trong quá trình tải lên.");
       return null;
     } finally {
       setIsUploading(false);

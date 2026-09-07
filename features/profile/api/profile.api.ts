@@ -23,7 +23,7 @@ export const profileApi = {
    */
   updateAuthDetails: async (email?: string, phone?: string) => {
     const supabase = createClient();
-    const authUpdates: any = {};
+    const authUpdates: Record<string, string> = {};
     if (email) authUpdates.email = email;
     if (phone) authUpdates.phone = phone;
 

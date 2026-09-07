@@ -40,9 +40,9 @@ export function ChangePasswordForm() {
       setOldPassword("");
       setPassword("");
       setConfirmPassword("");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Change password error:", err);
-      setError(err.message || "Đã xảy ra lỗi khi đổi mật khẩu.");
+      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi khi đổi mật khẩu.");
     } finally {
       setIsLoading(false);
     }
