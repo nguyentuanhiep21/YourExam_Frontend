@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Profile } from "../types";
-import { User, Mail, Phone, School, BookOpen, Calendar, Edit3, X, Save } from "lucide-react";
+import { User, Mail, Phone, School, BookOpen, Calendar, Edit3, X, Save, Camera } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { AvatarUpdateDialog } from "./AvatarUpdateDialog";
+import { CoverImageUpdateDialog } from "./CoverImageUpdateDialog";
 
 interface ProfileDetailProps {
   profile: Profile;
@@ -20,10 +21,16 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
   const [authFormData, setAuthFormData] = useState({ email: authEmail, phone: authPhone || "" });
   const [currentAuth, setCurrentAuth] = useState({ email: authEmail, phone: authPhone || "" });
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
+  const [isCoverDialogOpen, setIsCoverDialogOpen] = useState(false);
 
   const handleAvatarUpdated = (url: string) => {
     setProfile(prev => ({ ...prev, AvatarUrl: url }));
     setFormData(prev => ({ ...prev, AvatarUrl: url }));
+  };
+
+  const handleCoverUpdated = (url: string) => {
+    setProfile(prev => ({ ...prev, CoverUrl: url }));
+    setFormData(prev => ({ ...prev, CoverUrl: url }));
   };
 
   const formatDate = (dateString: string) => {
@@ -98,16 +105,35 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      <div className="bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_4px_30px_rgba(0,0,0,0.03)] rounded-3xl overflow-hidden">
+    <div className="w-full mx-auto space-y-6">
+      <div className="bg-white/80 backdrop-blur-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
         
         {/* Cover Image */}
-        <div className="h-32 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 relative"></div>
+        <div className="w-full aspect-[3/1] relative overflow-hidden group">
+          {profile.CoverUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={profile.CoverUrl} alt="Cover" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <button
+              onClick={() => setIsCoverDialogOpen(true)}
+              className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/40 px-5 py-2.5 rounded-full font-medium flex items-center gap-2 transition-all hover:scale-105"
+            >
+              <Camera className="w-4 h-4" />
+              Cập nhật ảnh bìa
+            </button>
+          </div>
+        </div>
         
-        <div className="px-8 pb-8">
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8">
-            <div className="relative shrink-0 w-32 h-32 -mt-16">
-              <div className="w-full h-full rounded-full border-4 border-white shadow-md bg-white flex items-center justify-center overflow-hidden relative">
+        <div className="px-6 sm:px-10 pb-10">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-10">
+            <div className="relative shrink-0 w-32 h-32 sm:w-36 sm:h-36 -mt-16 sm:-mt-20 mx-auto sm:mx-0 group">
+              <div className="w-full h-full rounded-full border-4 border-white shadow-lg bg-white flex items-center justify-center overflow-hidden relative transition-transform duration-300 group-hover:scale-105">
                 {profile.AvatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={profile.AvatarUrl} alt={profile.FullName} className="w-full h-full object-cover" />
@@ -119,7 +145,7 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
               </div>
               <button 
                 onClick={() => setIsAvatarDialogOpen(true)}
-                className="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full shadow-md border-2 border-white hover:bg-primary-hover transition-colors z-10"
+                className="absolute bottom-2 right-2 bg-primary text-white p-2.5 rounded-full shadow-lg border-2 border-white hover:bg-primary-hover hover:scale-110 transition-all z-10"
               >
                 <Edit3 className="w-4 h-4" />
               </button>
@@ -127,13 +153,13 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
             
             <div className="flex-1 w-full text-center sm:text-left sm:pt-2.5">
               {isEditing ? (
-                <input
-                  type="text"
-                  value={formData.FullName}
-                  onChange={(e) => setFormData({...formData, FullName: e.target.value})}
-                  className="text-2xl font-bold font-heading text-slate-900 border border-slate-200 rounded-xl px-3 py-1.5 w-full max-w-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary inline-block"
-                  placeholder="Nhập họ và tên"
-                />
+                  <input
+                    type="text"
+                    value={formData.FullName}
+                    onChange={(e) => setFormData({...formData, FullName: e.target.value})}
+                    className="text-2xl font-bold font-heading text-slate-900 border border-slate-200 rounded-xl px-4 py-2 w-full max-w-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white/50 backdrop-blur-sm transition-all"
+                    placeholder="Nhập họ và tên"
+                  />
               ) : (
                 <h1 className="text-2xl font-bold font-heading text-slate-900">{profile.FullName}</h1>
               )}
@@ -161,7 +187,7 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
                         type="text"
                         value={authFormData.phone}
                         onChange={(e) => setAuthFormData({...authFormData, phone: e.target.value})}
-                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-2 py-1 w-full focus:outline-none focus:border-primary"
+                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white/50 transition-all"
                         placeholder="Nhập số điện thoại"
                       />
                     ) : (
@@ -181,7 +207,7 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
                         type="email"
                         value={authFormData.email}
                         onChange={(e) => setAuthFormData({...authFormData, email: e.target.value})}
-                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-2 py-1 w-full focus:outline-none focus:border-primary"
+                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white/50 transition-all"
                         placeholder="Nhập email"
                       />
                     ) : (
@@ -208,7 +234,7 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
                         type="text"
                         value={formData.School || ""}
                         onChange={(e) => setFormData({...formData, School: e.target.value})}
-                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-2 py-1 w-full focus:outline-none focus:border-primary"
+                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white/50 transition-all"
                         placeholder="Nhập tên trường học"
                       />
                     ) : (
@@ -228,7 +254,7 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
                         type="text"
                         value={formData.SubjectsTaught || ""}
                         onChange={(e) => setFormData({...formData, SubjectsTaught: e.target.value})}
-                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-2 py-1 w-full focus:outline-none focus:border-primary"
+                        className="text-sm font-medium text-slate-800 border border-slate-200 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white/50 transition-all"
                         placeholder="Nhập môn giảng dạy"
                       />
                     ) : (
@@ -284,6 +310,13 @@ export function ProfileDetail({ profile: initialProfile, authEmail, authPhone }:
         onClose={() => setIsAvatarDialogOpen(false)}
         userId={profile.Id}
         onAvatarUpdated={handleAvatarUpdated}
+      />
+
+      <CoverImageUpdateDialog
+        isOpen={isCoverDialogOpen}
+        onClose={() => setIsCoverDialogOpen(false)}
+        userId={profile.Id}
+        onCoverUpdated={handleCoverUpdated}
       />
     </div>
   );

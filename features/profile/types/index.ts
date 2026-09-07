@@ -4,5 +4,6 @@ export interface Profile {
   School: string | null;
   SubjectsTaught: string | null;
   AvatarUrl: string | null;
+  CoverUrl?: string | null;
   CreatedAt: string;
 }

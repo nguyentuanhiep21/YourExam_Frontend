@@ -19,10 +19,12 @@ export default async function getCroppedImg(
     return null
   }
 
-  // We want a standard square avatar size, e.g. 400x400
-  const size = 400;
-  canvas.width = size
-  canvas.height = size
+  // Limit maximum width to avoid huge file sizes, while preserving aspect ratio
+  const MAX_WIDTH = 1200;
+  const scale = pixelCrop.width > MAX_WIDTH ? MAX_WIDTH / pixelCrop.width : 1;
+  
+  canvas.width = pixelCrop.width * scale;
+  canvas.height = pixelCrop.height * scale;
 
   // draw image on canvas
   ctx.drawImage(
@@ -33,8 +35,8 @@ export default async function getCroppedImg(
     pixelCrop.height,
     0,
     0,
-    size,
-    size
+    canvas.width,
+    canvas.height
   )
 
   return new Promise((resolve) => {
