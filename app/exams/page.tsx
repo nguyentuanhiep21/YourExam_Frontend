@@ -1,5 +1,5 @@
 import Navbar from "@/components/layout/Navbar";
-import { DocumentSearchHeader } from "@/features/documents/components/DocumentSearchHeader";
+import { DocumentPageHeader } from "@/features/documents/components/DocumentPageHeader";
 import { ExamCarousel } from "@/features/exam/components/ExamCarousel";
 import { createClient } from "@/lib/supabase/server";
 
@@ -154,7 +154,7 @@ export default async function DocumentsPage() {
       <Navbar />
       
       <main className="relative z-10 flex-1">
-        <DocumentSearchHeader />
+        <DocumentPageHeader />
         
         <div className="mt-4 mb-24 space-y-2">
           {trendingExams.length > 0 && (

@@ -2,7 +2,7 @@ import { Search, ChevronDown, PenTool } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { CreateExamButton } from "@/features/exam/components/CreateExamButton";
 
-export async function DocumentSearchHeader() {
+export async function DocumentPageHeader() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const categories = ["Toán học", "Tiếng Việt"];
