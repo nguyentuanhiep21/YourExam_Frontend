@@ -45,8 +45,8 @@ export function useSupport() {
       setTopics(data);
       setTotalTopics(total);
       setError(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export function useSupport() {
       newTopic.Comments = [];
       setTopics(prev => [newTopic, ...prev]);
       return newTopic;
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw err;
     }
   };
@@ -79,7 +79,7 @@ export function useSupport() {
         return topic;
       }));
       return newComment;
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw err;
     }
   };
@@ -98,7 +98,7 @@ export function useSupport() {
         }
         return topic;
       }));
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw err;
     }
   };
@@ -106,7 +106,7 @@ export function useSupport() {
   const uploadImage = async (file: File) => {
     try {
       return await supportApi.uploadImage(file);
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw err;
     }
   };
@@ -115,7 +115,7 @@ export function useSupport() {
     try {
       const ids = await supportApi.getSavedTopics(userId);
       setSavedTopicIds(ids);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to fetch saved topics:", err);
     }
   };
@@ -124,7 +124,7 @@ export function useSupport() {
     try {
       await supportApi.saveTopic(topicId, userId);
       setSavedTopicIds(prev => [...prev, topicId]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw err;
     }
   };
@@ -133,7 +133,7 @@ export function useSupport() {
     try {
       await supportApi.unsaveTopic(topicId, userId);
       setSavedTopicIds(prev => prev.filter(id => id !== topicId));
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw err;
     }
   };
@@ -174,7 +174,7 @@ export function useSupport() {
     try {
       await supportApi.deleteTopic(topicId, currentUser.Id);
       setTopics(prev => prev.filter(t => t.Id !== topicId));
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw err;
     }
   };
@@ -193,7 +193,7 @@ export function useSupport() {
         }
         return topic;
       }));
-    } catch (err: any) {
+    } catch (err: unknown) {
       throw err;
     }
   };

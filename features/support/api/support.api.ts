@@ -20,7 +20,7 @@ export const supportApi = {
       .range(from, to);
 
     if (error) throw new Error(error.message);
-    return { topics: data as any, total: count || 0 };
+    return { topics: data as unknown as Topic[], total: count || 0 };
   },
 
   getTopicComments: async (topicId: number, page: number = 1, limit: number = 10): Promise<TopicComment[]> => {
@@ -36,7 +36,7 @@ export const supportApi = {
       .range(from, to);
 
     if (error) throw new Error(error.message);
-    return data as any;
+    return data as unknown as TopicComment[];
   },
 
   createTopic: async (topicData: { Title: string; Content: string; AuthorId: string; ImageUrl?: string }): Promise<Topic> => {
@@ -61,7 +61,7 @@ export const supportApi = {
       .single();
 
     if (error) throw new Error(error.message);
-    return data as any;
+    return data as unknown as Topic;
   },
 
   createComment: async (commentData: { TopicId: number; Content: string; AuthorId: string }): Promise<TopicComment> => {
@@ -79,7 +79,7 @@ export const supportApi = {
 
     if (error) throw new Error(error.message);
 
-    return data as any;
+    return data as unknown as TopicComment;
   },
 
   uploadImage: async (file: File): Promise<string> => {
@@ -137,7 +137,7 @@ export const supportApi = {
       .eq("UserId", userId);
       
     if (error) throw new Error(error.message);
-    return data.map((d: any) => d.TopicId);
+    return data.map((d: { TopicId: number }) => d.TopicId);
   },
 
   deleteTopic: async (topicId: number, authorId: string): Promise<void> => {

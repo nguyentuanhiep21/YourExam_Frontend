@@ -42,9 +42,9 @@ export function TopicThread({
       setIsSubmitting(true);
       await onCreateComment(topic.Id, replyContent);
       setReplyContent("");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message || "Đã xảy ra lỗi khi tạo bình luận.", "Lỗi bình luận");
+      toast.error(err instanceof Error ? err.message : "Đã xảy ra lỗi khi tạo bình luận.", "Lỗi bình luận");
     } finally {
       setIsSubmitting(false);
     }

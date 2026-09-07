@@ -33,8 +33,8 @@ export function SupportClient() {
     try {
       setIsSubmitting(true);
       await addTopic(title, content, imageFile);
-    } catch (err: any) {
-      toast.error(err.message || "Đã xảy ra lỗi khi tạo chủ đề.", "Lỗi tạo chủ đề");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Đã xảy ra lỗi.", "Lỗi");
     } finally {
       setIsSubmitting(false);
     }
@@ -43,15 +43,15 @@ export function SupportClient() {
   const handleCreateComment = async (topicId: number, content: string) => {
     try {
       await addComment(topicId, content);
-    } catch (err: any) {
-      toast.error(err.message || "Đã xảy ra lỗi khi tạo bình luận.", "Lỗi bình luận");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Đã xảy ra lỗi.", "Lỗi");
     }
   };
 
   const handleToggleSave = async (topicId: number) => {
     try {
       await toggleSaveTopic(topicId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error("Đã xảy ra lỗi khi lưu/bỏ lưu chủ đề.", "Lỗi lưu chủ đề");
     }
   };
@@ -75,8 +75,8 @@ export function SupportClient() {
       }
       toast.success(itemToDelete.type === 'comment' ? "Bình luận đã được xóa." : "Chủ đề đã được xóa.", "Thành công");
       setItemToDelete(null);
-    } catch (err: any) {
-      toast.error(err.message || "Đã xảy ra lỗi khi xóa.", "Lỗi xóa");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Đã xảy ra lỗi khi xóa.", "Lỗi xóa");
     } finally {
       setIsDeleting(false);
     }
