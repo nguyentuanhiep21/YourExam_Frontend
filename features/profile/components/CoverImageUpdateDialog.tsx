@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useRef } from "react";
-import Cropper from "react-easy-crop";
+import Cropper, { Area } from "react-easy-crop";
 import { X, Upload, Check, Loader2, Image as ImageIcon } from "lucide-react";
 import getCroppedImg from "../utils/cropImage";
 import { profileApi } from "../api/profile.api";
@@ -17,11 +17,11 @@ export function CoverImageUpdateDialog({ isOpen, onClose, userId, onCoverUpdated
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+  const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
@@ -52,9 +52,9 @@ export function CoverImageUpdateDialog({ isOpen, onClose, userId, onCoverUpdated
       onCoverUpdated(finalUrl);
       resetState();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error uploading cover:", err);
-      alert("Lỗi khi tải ảnh lên. Chi tiết: " + (err.message || "Unknown error"));
+      alert("Lỗi khi tải ảnh lên. Chi tiết: " + (err instanceof Error ? err.message : "Unknown error"));
     } finally {
       setIsUploading(false);
     }
