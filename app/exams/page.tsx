@@ -2,14 +2,25 @@ import Navbar from "@/components/layout/Navbar";
 import { DocumentPageHeader } from "@/features/documents/components/DocumentPageHeader";
 import { ExamCarousel } from "@/features/exam/components/ExamCarousel";
 import { createClient } from "@/lib/supabase/server";
+import { ExamSummary } from "@/features/exam/types/exam.types";
+
+type ExamQueryResult = {
+  Id: number;
+  Title: string;
+  Subject: string;
+  GradeLevel: number;
+  DownloadCount: number;
+  UpvoteCount: number;
+  Author: { FullName: string } | { FullName: string }[];
+};
 
 export default async function DocumentsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  let myExams: any[] = [];
-  let trendingExams: any[] = [];
-  let newExams: any[] = [];
+  let myExams: ExamSummary[] = [];
+  let trendingExams: ExamSummary[] = [];
+  let newExams: ExamSummary[] = [];
 
   // Fetch Trending Exams (Top 10 out of 50 recent public exams by total engagement)
   const { data: recentExamsData } = await supabase
@@ -28,7 +39,7 @@ export default async function DocumentsPage() {
 
     const top10Trending = sortedForTrending.slice(0, 10);
 
-    const examIds = top10Trending.map((d: any) => d.Id);
+    const examIds = top10Trending.map((d: { Id: number }) => d.Id);
     let votedExamIds = new Set<number>();
     
     if (user && examIds.length > 0) {
@@ -39,11 +50,13 @@ export default async function DocumentsPage() {
         .in("ExamId", examIds);
         
       if (userVotes) {
-        userVotes.forEach((v: any) => votedExamIds.add(v.ExamId));
+        userVotes.forEach((v: { ExamId: number }) => votedExamIds.add(v.ExamId));
       }
     }
 
-    trendingExams = top10Trending.map((exam: any) => ({
+    trendingExams = top10Trending.map((exam: unknown) => {
+      const e = exam as ExamQueryResult;
+      return {
       id: exam.Id.toString(),
       title: exam.Title || "Đề thi chưa đặt tên",
       subject: exam.Subject || "Chung",
@@ -52,8 +65,9 @@ export default async function DocumentsPage() {
       upvotes: exam.UpvoteCount || 0,
       tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
       hasUpvoted: votedExamIds.has(exam.Id),
-      authorName: (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as any)?.FullName) || "Khuyết danh"
-    }));
+      authorName: (Array.isArray(e.Author) ? e.Author[0]?.FullName : (e.Author as { FullName: string })?.FullName) || "Khuyết danh"
+    };
+  });
   }
 
   // Fetch New Public Exams
@@ -65,7 +79,7 @@ export default async function DocumentsPage() {
     .limit(12);
 
   if (publicExamsData) {
-    const examIds = publicExamsData.map((d: any) => d.Id);
+    const examIds = publicExamsData.map((d: { Id: number }) => d.Id);
     let votedExamIds = new Set<number>();
     
     if (user && examIds.length > 0) {
@@ -76,11 +90,13 @@ export default async function DocumentsPage() {
         .in("ExamId", examIds);
         
       if (userVotes) {
-        userVotes.forEach((v: any) => votedExamIds.add(v.ExamId));
+        userVotes.forEach((v: { ExamId: number }) => votedExamIds.add(v.ExamId));
       }
     }
 
-    newExams = publicExamsData.map((exam: any) => ({
+    newExams = publicExamsData.map((exam: unknown) => {
+      const e = exam as ExamQueryResult;
+      return {
       id: exam.Id.toString(),
       title: exam.Title || "Đề thi chưa đặt tên",
       subject: exam.Subject || "Chung",
@@ -89,8 +105,9 @@ export default async function DocumentsPage() {
       upvotes: exam.UpvoteCount || 0,
       tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
       hasUpvoted: votedExamIds.has(exam.Id),
-      authorName: (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as any)?.FullName) || "Khuyết danh"
-    }));
+      authorName: (Array.isArray(e.Author) ? e.Author[0]?.FullName : (e.Author as { FullName: string })?.FullName) || "Khuyết danh"
+    };
+  });
   }
 
   if (user) {
@@ -126,7 +143,7 @@ export default async function DocumentsPage() {
         upvotes: exam.UpvoteCount || 0,
         tags: [exam.Subject, `Lớp ${exam.GradeLevel}`].filter(Boolean),
         hasUpvoted: votedExamIds.has(exam.Id),
-        authorName: (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as any)?.FullName) || "Bạn"
+        authorName: (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as { FullName: string })?.FullName) || "Bạn"
       }));
     }
   }
