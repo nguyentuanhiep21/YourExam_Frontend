@@ -3,6 +3,21 @@ import { Profile } from "../types";
 
 export const profileApi = {
   /**
+   * Get user profile by ID
+   */
+  getProfileById: async (userId: string): Promise<Profile> => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("Profiles")
+      .select("*")
+      .eq("Id", userId)
+      .single();
+
+    if (error) throw error;
+    return data as Profile;
+  },
+
+  /**
    * Update user profile information
    */
   updateProfile: async (

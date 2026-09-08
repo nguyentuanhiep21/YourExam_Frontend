@@ -11,6 +11,8 @@ import Link from "next/link";
 import { updateGeneratedExam, upvoteGeneratedExam } from "../api/exam.actions";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/alerts/toast-context";
+import { AuthorProfileDialog } from "@/features/profile/components/AuthorProfileDialog";
+import { useProfile } from "@/features/profile/hooks/useProfile";
 
 interface ExamViewerProps {
   exam: GeneratedExam;
@@ -40,6 +42,12 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
   const [totalScore, setTotalScore] = useState(exam.TotalScore);
   const [isPublic, setIsPublic] = useState(exam.IsPublic);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAuthorProfileOpen, setIsAuthorProfileOpen] = useState(false);
+  
+  // Only fetch profile when dialog is open to save unnecessary requests
+  const { profile: authorProfile, isLoading: isAuthorLoading, error: authorError } = useProfile(
+    isAuthorProfileOpen && exam.AuthorId ? exam.AuthorId : undefined
+  );
   
   const authorName = (Array.isArray(exam.Author) ? exam.Author[0]?.FullName : (exam.Author as { FullName: string })?.FullName) || "Khuyết danh";
   
@@ -370,7 +378,13 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
                   {title}
                 </h1>
                 <p className="text-sm text-slate-500 font-medium">
-                  đăng bởi <span className="text-indigo-600 font-semibold">{authorName}</span>
+                  đăng bởi{" "}
+                  <button 
+                    onClick={() => setIsAuthorProfileOpen(true)}
+                    className="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline focus:outline-none transition-colors"
+                  >
+                    {authorName}
+                  </button>
                 </p>
               </div>
             )}
@@ -533,6 +547,16 @@ export default function ExamViewer({ exam, currentUserId }: ExamViewerProps) {
         }}
         onCancel={() => setShowExitConfirm(false)}
       />
+
+      {exam.AuthorId && (
+        <AuthorProfileDialog
+          isOpen={isAuthorProfileOpen}
+          onClose={() => setIsAuthorProfileOpen(false)}
+          profile={authorProfile}
+          isLoading={isAuthorLoading}
+          error={authorError}
+        />
+      )}
     </div>
   );
 }
